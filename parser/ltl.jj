@@ -1,0 +1,267 @@
+options {
+    STATIC = false;
+    TRACK_TOKENS = true;
+    OUTPUT_DIRECTORY = "./src/main/java/cambio/tltea/parser/ltl/generated";
+//    DEBUG_TOKEN_MANAGER = true;
+//    DEBUG_PARSER = true;
+}
+
+PARSER_BEGIN(LTLParser)
+
+package cambio.tltea.parser.ltl.generated;
+
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import cambio.tltea.parser.core.*;
+
+/**
+* LTL parser class.
+* @see <a href="https://moves.rwth-aachen.de/wp-content/uploads/WS1920/MC/mc2019_handout_lec7.pdf" >FormalDescription of LTL by Joost-Pieter Katoen, RWTH Achen </a>
+*/
+public class LTLParser {
+    public static void main(String[] args){
+
+        InputStream input;
+        if (args.length>0) {
+            input =new ByteArrayInputStream(args[0].getBytes());
+        }
+        else {
+            input = System.in;
+        }
+        LTLParser parser = new LTLParser(input,"UTF-8");
+    }
+
+    /**
+    * Creates a new parser for the given input string.
+    * Assumes UTF-8 encoding.
+    * For other encodings see {@link #LTLParser(java.io.InputStream, String)}.
+    */
+    public LTLParser(String ltlFormula){
+        this(new ByteArrayInputStream(ltlFormula.getBytes(StandardCharsets.UTF_8)),"UTF-8");
+    }
+
+    /**
+    * Reinitialize the parser. Assumes UTF-8 encoding.
+    *
+    *
+    * For other encodings see {@link #ReInit(java.io.InputStream, String)}.
+    */
+    public void ReInit(String s){
+        this.ReInit(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)),"UTF-8");
+    }
+}
+
+PARSER_END(LTLParser)
+
+SKIP : {
+ " " | "\n" | "\t" | "\r" | "\f"
+}
+
+//logical operators
+TOKEN : {
+    < AND: "&" | "∧" >
+|   < OR: "|" | "∨" >
+|   < IMPLIES: "->" | "→" >
+|   < IFF: "<->" | "↔" >
+|   < NOT: "!" | "¬" >
+|   < TRUE: "true" | "True" | "TRUE" >
+|   < FALSE: "false" | "False" | "FALSE" >
+}
+
+//comparison operators
+TOKEN : {
+    < EQ: "=" | "==" >
+|   < NEQ: "!=" | "≠" >
+|   < GT: ">" >
+|   < GE: ">=" >
+|   < LT: "<" >
+|   < LE: "<=" >
+}
+
+//LTL unary operators
+TOKEN : {
+    < NEXT_T: "N"| "n"| "X" | "x" | "○">
+|   < GLOBALLY_T: "G" | "g" | "☐" >
+|   < FINALLY_T: "F" | "f" | "◇" >
+}
+
+//LTL binary operators
+TOKEN : {
+    < UNTIL_T: "U" | "u" >
+|   < RELEASE_T: "R" | "r" >
+|   < WEAKUNTIL_T: "W" | "w" >
+}
+
+//value token
+TOKEN :
+{
+    < NUM: ( ["0"-"9"] )+ >
+|   < DECIMAL_NUM: ( ["0"-"9"] )* "." ( ["0"-"9"] )* >
+|   < PROPOSITION: "(" (~["(",")"])+ ")" >
+}
+
+/**
+* Root Production Rule.
+* Use this method to parse an LTL Formula String.
+*
+* @return the root node of the LTL formulas' AST
+* @throws ParseException if the formula is not well-formed or empty
+*/
+ASTNode LTL_Formula_File():
+{
+   ASTNode root = null;
+}
+{
+    root = LTL_Formula() <EOF>
+    {
+        return root;
+    }
+}
+
+ASTNode LTL_Formula():
+{
+ ASTNode t1;
+}
+{
+    ( "(" t1=LTL_Formula() ")" {t1.setBracketed(true);}| t1=UnaryOperation() | t1=ValueOrComparison() ) (t1=Concatination(t1))*
+    {
+        return t1;
+    }
+}
+
+
+UnaryOperationASTNode UnaryOperation():
+{
+ Token operator;
+ ASTNode child;
+}
+{
+    (operator=<NOT> | operator=UnaryLTLOperator()) child=LTL_Formula()
+    {
+        return new UnaryOperationASTNode(tokenImage[operator.kind], child);
+    }
+}
+
+
+/**
+* Concatination Production Rule.
+*
+* <p>
+* This production rule tries to concatenate the given leading node with the next node.
+* Returns a node that tries to align the leading node as its left child and the next node as its right child.
+* However, depending on the operator precedence, the operator and child node might seep further into the tree.
+*
+* @see BinaryOperationASTNode#seepIn
+*/
+BinaryOperationASTNode Concatination(ASTNode leading):
+{
+    Token operator;
+    ASTNode node;
+}
+{
+(
+    operator=BinaryLogicOperator()
+|   operator=BinaryLTLOperator()
+) node = LTL_Formula()
+    {
+        LiteralOperatorInfo operatorInfo = new LiteralOperatorInfo(tokenImage[operator.kind]);
+        if(node instanceof BinaryOperationASTNode)
+            {
+                BinaryOperationASTNode biNode = (BinaryOperationASTNode) node;
+                return biNode.seepIn(operatorInfo, leading);
+            }
+        else {
+            return new BinaryOperationASTNode(operatorInfo, leading, node);
+        }
+    }
+}
+
+
+ASTNode ValueOrComparison():
+{
+    Token operator=null;
+    Token left=null;
+    Token right=null;
+}
+{
+    left=Value() [operator=BinaryMathComparisonOperator()  right=Value()]
+    {
+        if(operator !=null){
+            ASTNode node = new BinaryOperationASTNode(new LiteralOperatorInfo(tokenImage[operator.kind]),
+                                                      new ValueASTNode(left.image),
+                                                      new ValueASTNode(right.image));
+            node.setBracketed(true);
+            return node;
+        }
+        else if(left.kind == NUM)
+            {
+                throw new ParseException("Number literals are not supported.");
+            }
+        else
+            return new ValueASTNode(left.image);
+    }
+}
+
+Token Value():
+{
+    Token t;
+}
+{
+(
+    t=<TRUE>
+|   t=<FALSE>
+|   t=<PROPOSITION>
+|   t=<NUM>
+|   t=<DECIMAL_NUM>
+)
+    {
+        return t;
+    }
+}
+
+
+Token UnaryLTLOperator():
+{
+    Token t;
+}
+{
+    (t=<NEXT_T> | t=<GLOBALLY_T> | t=<FINALLY_T>)
+    {
+        return t;
+    }
+}
+
+Token BinaryLogicOperator():
+{
+    Token t;
+}
+{
+    (t=<AND> | t=<OR> | t=<IMPLIES> | t=<IFF>)
+    {
+        return t;
+    }
+}
+
+Token BinaryMathComparisonOperator():
+{
+    Token t;
+}
+{
+    (t=<EQ> | t=<NEQ> | t=<GT> | t=<GE> | t=<LT> | t=<LE>)
+    {
+        return t;
+    }
+}
+
+Token BinaryLTLOperator():
+{
+    Token t;
+}
+{
+    (t=<UNTIL_T> | t=<RELEASE_T> | t=<WEAKUNTIL_T>)
+    {
+        return t;
+    }
+}
+

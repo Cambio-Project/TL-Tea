@@ -1,0 +1,305 @@
+options {
+    STATIC = false;
+    TRACK_TOKENS = true;
+    OUTPUT_DIRECTORY = "./src/main/java/cambio/tltea/parser/mtl/generated";
+//    DEBUG_TOKEN_MANAGER = true;
+//    DEBUG_PARSER = true;
+}
+
+PARSER_BEGIN(MTLParser)
+
+package cambio.tltea.parser.mtl.generated;
+
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import cambio.tltea.parser.core.*;
+
+/**
+* MTL parser class.
+*
+* @see <a href="https://www.cis.upenn.edu/~alur/JACM94.pdf">RAJEEV ALUR AND THOMAS A. HENZINGER: A Really Temporal Logic. </a>                                                     </a>
+*/
+public class MTLParser {
+    public static void main(String[] args){
+
+        InputStream input;
+        if (args.length>0) {
+            input =new ByteArrayInputStream(args[0].getBytes());
+        }
+        else {
+            input = System.in;
+        }
+        MTLParser parser = new MTLParser(input,"UTF-8");
+    }
+
+    /**
+    * Creates a new parser for the given input string.
+    * Assumes UTF-8 encoding.
+    * For other encodings see {@link #MTLParser(java.io.InputStream, String)}.
+    */
+    public MTLParser(String mtlFormula){
+        this(new ByteArrayInputStream(mtlFormula.getBytes(StandardCharsets.UTF_8)),"UTF-8");
+    }
+
+    /**
+    * Reinitialize the parser. Assumes UTF-8 encoding.
+    *
+    *
+    * For other encodings see {@link #ReInit(java.io.InputStream, String)}.
+    */
+    public void ReInit(String s){
+        this.ReInit(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)),"UTF-8");
+    }
+}
+
+PARSER_END(MTLParser)
+
+SKIP : {
+ " " | "\n" | "\t" | "\r" | "\f"
+}
+
+//logical operators
+TOKEN : {
+    < AND: "&" | "∧" >
+|   < OR: "|" | "∨" >
+|   < IMPLIES: "->" | "→" | "=>" >
+|   < IFF: "<->" | "↔" >
+|   < NOT: "!" | "¬" >
+|   < TRUE: "true" | "True" | "TRUE" >
+|   < FALSE: "false" | "False" | "FALSE" >
+}
+
+//comparison operators
+TOKEN : {
+    < EQ: "=" | "==" >
+|   < NEQ: "!=" | "≠" >
+|   < GT: ">" >
+|   < GE: ">=" >
+|   < LT: "<" >
+|   < LE: "<=" >
+}
+
+//MTL unary operators
+TOKEN : {
+    < GLOBALLY_T: "G" | "g" | "☐" >
+|   < NEXT_T: "N"| "n"| "X" | "x" | "○">
+|   < FINALLY_T: "F" | "f" | "◇" >
+|   < HISTORY_T: "H" | "h"| "◁" >
+|   < PAST_T: "P" | "p"  >
+|   < PROPHCY_T: "▷">
+}
+
+//MTL binary operators
+TOKEN : {
+    < UNTIL_T: "U" | "u" >
+|   < SINCE_T: "S" | "s" >
+|   < RELEASE_T: "R" | "r" >
+|   < BEFORE_T: "B" | "b" >
+|   < WEAKUNTIL_T: "W" | "w" >
+}
+
+//value token
+TOKEN :
+{
+    < NUM: ( ["0"-"9"] )+ >
+|   < DECIMAL_NUM: ( ["0"-"9"] )* "." ( ["0"-"9"] )* >
+|   < PROPOSITION: "(" (~["(",")"])+ ")" >
+|   < TEMPORAL_PROPOSITION: "[" (~["[","]"])+  "]" > //collects the rest of symbols
+}
+
+/**
+* Root Production Rule.
+* Use this method to parse an MTL Formula String.
+*
+* @return the root node of the MTL formulas' AST
+* @throws ParseException if the formula is not well-formed or empty
+*/
+ASTNode MTL_Formula_File():
+{
+   ASTNode root = null;
+}
+{
+    root = MTL_Formula() <EOF>
+    {
+        return root;
+    }
+}
+
+ASTNode MTL_Formula():
+{
+ ASTNode t1;
+}
+{
+    ( "(" t1=MTL_Formula() ")" {t1.setBracketed(true);}| t1=UnaryOperation() | t1=ValueOrComparison() ) (t1=Concatination(t1))*
+    {
+        return t1;
+    }
+}
+
+
+UnaryOperationASTNode UnaryOperation():
+{
+ TemporalOperatorInfo temporalOperatorInfo = null;
+ Token nonTemporalOperator = null;
+ ASTNode child;
+}
+{
+    (nonTemporalOperator=<NOT> | temporalOperatorInfo=UnaryMTLOperator()) child=MTL_Formula()
+    {
+        if(nonTemporalOperator !=null) {
+            return new UnaryOperationASTNode(tokenImage[nonTemporalOperator.kind], child);
+        }
+        else {
+            return new TemporalUnaryOperationASTNode(temporalOperatorInfo, child);;
+        }
+    }
+}
+
+
+/**
+* Concatination Production Rule.
+*
+* <p>
+* This production rule tries to concatenate the given leading node with the next node.
+* Returns a node that tries to align the leading node as its left child and the next node as its right child.
+* However, depending on the operator precedence, the operator and child node might seep further into the tree.
+*
+* @see BinaryOperationASTNode#seepIn
+*/
+BinaryOperationASTNode Concatination(ASTNode leading):
+{
+    Token operator =null;
+    TemporalOperatorInfo temporalOperatorInfo = null;
+    ASTNode following;
+}
+{
+(
+    operator=BinaryLogicOperator()
+|   temporalOperatorInfo=BinaryMTLOperator()
+) following = MTL_Formula()
+    {
+        IOperatorInfo info = temporalOperatorInfo;
+        if(operator!=null){
+            info = new LiteralOperatorInfo(tokenImage[operator.kind]);
+        }
+
+        if(following instanceof BinaryOperationASTNode)
+        {
+            return ((BinaryOperationASTNode) following).seepIn(info, leading);
+        }
+
+        if(info instanceof TemporalOperatorInfo){
+            return new TemporalBinaryOperationASTNode(((TemporalOperatorInfo) info), leading, following);
+        }
+        else{
+            return new BinaryOperationASTNode((LiteralOperatorInfo) info, leading, following);
+        }
+    }
+}
+
+
+ASTNode ValueOrComparison():
+{
+    Token operator=null;
+    Token left=null;
+    Token right=null;
+}
+{
+    left=Value() [operator=BinaryMathComparisonOperator()  right=Value()]
+    {
+        if(operator !=null){
+            ASTNode node = new BinaryOperationASTNode(tokenImage[operator.kind], new ValueASTNode(left.image), new ValueASTNode(right.image));
+            node.setBracketed(true);
+            return node;
+        }
+        else if(left.kind == NUM)
+            {
+                throw new ParseException("Number literals are not supported.");
+            }
+        else
+            return new ValueASTNode(left.image);
+    }
+}
+
+Token Value():
+{
+    Token t;
+}
+{
+(
+    t=<TRUE>
+|   t=<FALSE>
+|   t=<PROPOSITION>
+|   t=<NUM>
+|   t=<DECIMAL_NUM>
+)
+    {
+        return t;
+    }
+}
+
+
+TemporalOperatorInfo UnaryMTLOperator():
+{
+    Token t;
+    String temporalInfo =null;
+}
+{
+    (t=<GLOBALLY_T> | t=<NEXT_T> | t=<FINALLY_T> | t=<HISTORY_T> | t=<PAST_T>) [temporalInfo=TemporalInfo()]
+    {
+        if(temporalInfo ==null)
+            temporalInfo = "[0, ∞]";
+    return new TemporalOperatorInfo(t.image, temporalInfo);
+    }
+}
+
+String TemporalInfo():
+{
+    Token op=null;
+}
+{
+(
+    op = < TEMPORAL_PROPOSITION >
+)
+    {
+        return op.image;
+    }
+}
+
+Token BinaryLogicOperator():
+{
+    Token t;
+}
+{
+    (t=<AND> | t=<OR> | t=<IMPLIES> | t=<IFF>)
+    {
+        return t;
+    }
+}
+
+Token BinaryMathComparisonOperator():
+{
+    Token t;
+}
+{
+    (t=<EQ> | t=<NEQ> | t=<GT> | t=<GE> | t=<LT> | t=<LE>)
+    {
+        return t;
+    }
+}
+
+TemporalOperatorInfo BinaryMTLOperator():
+{
+    Token t;
+    String temporalInfo = null;
+}
+{
+    (t=<UNTIL_T> | t=<RELEASE_T> | t=<SINCE_T> | t=<BEFORE_T> | t=<WEAKUNTIL_T> ) [temporalInfo=TemporalInfo()]
+    {
+        if(temporalInfo ==null)
+            temporalInfo = "[0, ∞]";
+        return new TemporalOperatorInfo(tokenImage[t.kind], temporalInfo);
+    }
+}
+
