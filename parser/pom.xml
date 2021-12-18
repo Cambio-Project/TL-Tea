@@ -27,14 +27,13 @@
                 <version>4.1.4</version>
                 <executions>
                     <execution>
-                        <id>jjc1</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>javacc</goal>
                         </goals>
                         <configuration>
                             <jdkVersion>1.5</jdkVersion>
-                            <sourceDirectory>.</sourceDirectory>
+                            <sourceDirectory>${project.basedir}/grammars</sourceDirectory>
                             <outputDirectory>./src/main/java</outputDirectory>
                             <includes>
                                 <include>*.jj</include>
@@ -48,5 +47,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
