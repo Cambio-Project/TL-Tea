@@ -1,7 +1,9 @@
 package cambio.tltea.parser.mtl.generated;
 
 import cambio.tltea.parser.core.*;
-import cambio.tltea.parser.ltl.generated.LTLParser;
+import cambio.tltea.parser.core.temporal.TemporalBinaryOperationASTNode;
+import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
+import cambio.tltea.parser.core.temporal.TemporalUnaryOperationASTNode;
 import cambio.tltea.parser.testhelper.ASTTreeComparison;
 import org.junit.jupiter.api.Test;
 

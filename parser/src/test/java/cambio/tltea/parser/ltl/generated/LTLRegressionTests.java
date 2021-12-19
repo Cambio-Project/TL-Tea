@@ -9,7 +9,7 @@ import cambio.tltea.parser.core.ValueASTNode;
 
 
 /**
- * Regression tests. THis file lists some LTL formulas that ware created with PSP Wizard and tests the parser for
+ * Regression tests. This file lists some LTL formulas that ware created with PSP Wizard and tests the parser for
  * correctness.
  *
  * @author Lion Wagner

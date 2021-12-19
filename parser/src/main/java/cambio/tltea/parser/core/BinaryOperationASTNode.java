@@ -1,5 +1,8 @@
 package cambio.tltea.parser.core;
 
+import cambio.tltea.parser.core.temporal.TemporalBinaryOperationASTNode;
+import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
+
 /**
  * @author Lion Wagner
  */

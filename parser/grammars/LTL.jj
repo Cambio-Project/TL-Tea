@@ -55,7 +55,7 @@ public class LTLParser {
 PARSER_END(LTLParser)
 
 SKIP : {
- " " | "\n" | "\t" | "\r" | "\f"
+ " " | "\n" | "\t" | "\r" | "\f" | "\b"
 }
 
 //logical operators

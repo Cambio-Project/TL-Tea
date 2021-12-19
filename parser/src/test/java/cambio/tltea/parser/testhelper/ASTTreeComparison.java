@@ -1,6 +1,7 @@
 package cambio.tltea.parser.testhelper;
 
 import cambio.tltea.parser.core.ASTNode;
+import cambio.tltea.parser.core.temporal.ITemporalExpressionValueHolder;
 import org.junit.jupiter.api.Assertions;
 import cambio.tltea.parser.core.*;
 
@@ -48,11 +49,11 @@ public final class ASTTreeComparison {
             }
 
             if (root1 instanceof ITemporalExpressionValueHolder holder1 && root2 instanceof ITemporalExpressionValueHolder holder2) {
-                Assertions.assertEquals(holder1.getTemporalExpressionValue(),
-                                        holder2.getTemporalExpressionValue(),
+                Assertions.assertEquals(holder1.getTemporalValue(),
+                                        holder2.getTemporalValue(),
                                         "Wrong temporal value at depth %s. Expected '%s' got '%s' ".formatted(depth,
-                                                                                                              holder1.getTemporalExpressionValue(),
-                                                                                                              holder2.getTemporalExpressionValue()));
+                                                                                                              holder1.getTemporalValue(),
+                                                                                                              holder2.getTemporalValue()));
             }
 
             if (root1 instanceof UnaryOperationASTNode node && root2 instanceof UnaryOperationASTNode node2) {

@@ -30,7 +30,7 @@ public class LTLInvalidInputTests {
         assertThrowsException("()");
 
         for (int i = 0; i < 3; i++) {
-            assertThrowsException("()".repeat(new Random().nextInt(Integer.MAX_VALUE / 2)));
+            assertThrowsException("()".repeat(new Random().nextInt(Integer.MAX_VALUE / 8)));
         }
     }
 

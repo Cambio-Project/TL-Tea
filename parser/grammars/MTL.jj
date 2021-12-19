@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import cambio.tltea.parser.core.*;
+import cambio.tltea.parser.core.temporal.*;
 
 /**
 * MTL parser class.
@@ -56,7 +57,7 @@ public class MTLParser {
 PARSER_END(MTLParser)
 
 SKIP : {
- " " | "\n" | "\t" | "\r" | "\f"
+ " " | "\n" | "\t" | "\r" | "\f" | "\b"
 }
 
 //logical operators
