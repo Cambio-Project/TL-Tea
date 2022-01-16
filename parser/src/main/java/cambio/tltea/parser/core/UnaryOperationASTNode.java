@@ -5,7 +5,7 @@ package cambio.tltea.parser.core;
  */
 public class UnaryOperationASTNode extends OperatorASTNode {
 
-    private final ASTNode child;
+    private ASTNode child;
 
 
     public UnaryOperationASTNode(String operator, ASTNode child) {
@@ -21,6 +21,10 @@ public class UnaryOperationASTNode extends OperatorASTNode {
 
     public ASTNode getChild() {
         return child;
+    }
+
+    public void setChild(ASTNode child) {
+        this.child = child;
     }
 
     @Override

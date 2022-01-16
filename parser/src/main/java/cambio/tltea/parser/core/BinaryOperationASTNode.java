@@ -12,6 +12,9 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     protected ASTNode right;
     protected final int operatorPriority;
 
+    public BinaryOperationASTNode(OperatorToken operator, ASTNode left, ASTNode right) {
+        this(operator.image, left, right);
+    }
 
     public BinaryOperationASTNode(String operatorImage, ASTNode left, ASTNode right) {
         super(operatorImage);
@@ -103,6 +106,14 @@ public class BinaryOperationASTNode extends OperatorASTNode {
 
     public ASTNode getRightChild() {
         return right;
+    }
+
+    public void setLeftChild(ASTNode left) {
+        this.left = left;
+    }
+
+    public void setRightChild(ASTNode right) {
+        this.right = right;
     }
 }
 

@@ -5,18 +5,18 @@ package cambio.tltea.parser.core;
  */
 public abstract class ASTNode {
 
-    protected ASTNode parent;
+    protected OperatorASTNode parent;
 
     protected boolean isBracketed = false;
 
     public ASTNode() {
     }
 
-    public final ASTNode getParent() {
+    public final OperatorASTNode getParent() {
         return parent;
     }
 
-    protected final void setParent(ASTNode parent) {
+    protected final void setParent(OperatorASTNode parent) {
         this.parent = parent;
     }
 
