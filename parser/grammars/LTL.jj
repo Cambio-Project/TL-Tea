@@ -119,7 +119,7 @@ ASTNode LTL_Formula_File():
     }
 }
 
-ASTNode LTL_Formula():
+private ASTNode LTL_Formula():
 {
  ASTNode t1;
 }
@@ -131,7 +131,7 @@ ASTNode LTL_Formula():
 }
 
 
-UnaryOperationASTNode UnaryOperation():
+private UnaryOperationASTNode UnaryOperation():
 {
  Token operator;
  ASTNode child;
@@ -154,7 +154,7 @@ UnaryOperationASTNode UnaryOperation():
 *
 * @see BinaryOperationASTNode#seepIn
 */
-BinaryOperationASTNode Concatination(ASTNode leading):
+private BinaryOperationASTNode Concatination(ASTNode leading):
 {
     Token operator;
     ASTNode node;
@@ -178,7 +178,7 @@ BinaryOperationASTNode Concatination(ASTNode leading):
 }
 
 
-ASTNode ValueOrComparison():
+private ASTNode ValueOrComparison():
 {
     Token operator=null;
     Token left=null;
@@ -203,7 +203,7 @@ ASTNode ValueOrComparison():
     }
 }
 
-Token Value():
+private Token Value():
 {
     Token t;
 }
@@ -221,7 +221,7 @@ Token Value():
 }
 
 
-Token UnaryLTLOperator():
+private Token UnaryLTLOperator():
 {
     Token t;
 }
@@ -232,7 +232,7 @@ Token UnaryLTLOperator():
     }
 }
 
-Token BinaryLogicOperator():
+private Token BinaryLogicOperator():
 {
     Token t;
 }
@@ -243,7 +243,7 @@ Token BinaryLogicOperator():
     }
 }
 
-Token BinaryMathComparisonOperator():
+private Token BinaryMathComparisonOperator():
 {
     Token t;
 }
@@ -254,7 +254,7 @@ Token BinaryMathComparisonOperator():
     }
 }
 
-Token BinaryLTLOperator():
+private Token BinaryLTLOperator():
 {
     Token t;
 }

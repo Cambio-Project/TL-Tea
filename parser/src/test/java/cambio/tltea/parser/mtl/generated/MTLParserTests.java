@@ -14,7 +14,7 @@ class MTLParserTests {
     @Test
     void Value() throws ParseException {
         MTLParser parser = new MTLParser("(proposition)");
-        ASTNode node = parser.ValueOrComparison();
+        ASTNode node = parser.MTL_Formula_File();
 
         ASTTreeComparison.compareAST(new ValueASTNode("(proposition)"), node);
     }
@@ -26,14 +26,14 @@ class MTLParserTests {
         ASTNode value2 = new ValueASTNode("2");
         ASTNode expected = new BinaryOperationASTNode(">", value1, value2);
 
-        ASTNode node = parser.ValueOrComparison();
+        ASTNode node = parser.MTL_Formula_File();
         ASTTreeComparison.compareAST(expected, node);
     }
 
     @Test
     void unaryOperation() throws ParseException {
         MTLParser parser = new MTLParser("!F[10](do_stuff)");
-        UnaryOperationASTNode node = parser.UnaryOperation();
+        ASTNode node = parser.MTL_Formula_File();
 
         ASTNode value = new ValueASTNode("(do_stuff)");
         UnaryOperationASTNode expectedNested = new TemporalUnaryOperationASTNode(new TemporalOperatorInfo("F","[10]"), value);
@@ -45,7 +45,7 @@ class MTLParserTests {
     @Test
     void binaryMTLOperator() throws ParseException {
         MTLParser parser = new MTLParser("(A)&(B)&(C)|(D)&(F)");
-        ASTNode result = parser.MTL_Formula();
+        ASTNode result = parser.MTL_Formula_File();
 
         new ValueASTNode("(A)");
         new ValueASTNode("(B)");
@@ -70,25 +70,25 @@ class MTLParserTests {
     @Test
     void MTL_Formula_returns_correct_type() throws ParseException {
         MTLParser parser = new MTLParser("(A)");
-        ASTNode result = parser.MTL_Formula();
+        ASTNode result = parser.MTL_Formula_File();
         assertTrue(result instanceof ValueASTNode);
 
         parser = new MTLParser("!(A)");
-        result = parser.MTL_Formula();
+        result = parser.MTL_Formula_File();
         assertTrue(result instanceof UnaryOperationASTNode);
 
         parser = new MTLParser("(A)&(B)");
-        result = parser.MTL_Formula();
+        result = parser.MTL_Formula_File();
         assertTrue(result instanceof BinaryOperationASTNode);
 
 
         parser = new MTLParser("G[10](A)");
-        result = parser.MTL_Formula();
+        result = parser.MTL_Formula_File();
         assertTrue(result instanceof TemporalUnaryOperationASTNode);
 
 
         parser = new MTLParser("(A)S[10](B)");
-        result = parser.MTL_Formula();
+        result = parser.MTL_Formula_File();
         assertTrue(result instanceof TemporalBinaryOperationASTNode);
 
     }

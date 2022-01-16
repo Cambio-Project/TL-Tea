@@ -127,7 +127,7 @@ ASTNode MTL_Formula_File():
     }
 }
 
-ASTNode MTL_Formula():
+private ASTNode MTL_Formula():
 {
  ASTNode t1;
 }
@@ -139,7 +139,7 @@ ASTNode MTL_Formula():
 }
 
 
-UnaryOperationASTNode UnaryOperation():
+private UnaryOperationASTNode UnaryOperation():
 {
  TemporalOperatorInfo temporalOperatorInfo = null;
  Token nonTemporalOperator = null;
@@ -168,7 +168,7 @@ UnaryOperationASTNode UnaryOperation():
 *
 * @see BinaryOperationASTNode#seepIn
 */
-BinaryOperationASTNode Concatination(ASTNode leading):
+private BinaryOperationASTNode Concatination(ASTNode leading):
 {
     Token operator =null;
     TemporalOperatorInfo temporalOperatorInfo = null;
@@ -200,7 +200,7 @@ BinaryOperationASTNode Concatination(ASTNode leading):
 }
 
 
-ASTNode ValueOrComparison():
+private ASTNode ValueOrComparison():
 {
     Token operator=null;
     Token left=null;
@@ -223,7 +223,7 @@ ASTNode ValueOrComparison():
     }
 }
 
-Token Value():
+private Token Value():
 {
     Token t;
 }
@@ -241,7 +241,7 @@ Token Value():
 }
 
 
-TemporalOperatorInfo UnaryMTLOperator():
+private TemporalOperatorInfo UnaryMTLOperator():
 {
     Token t;
     String temporalInfo =null;
@@ -255,7 +255,7 @@ TemporalOperatorInfo UnaryMTLOperator():
     }
 }
 
-String TemporalInfo():
+private String TemporalInfo():
 {
     Token op=null;
 }
@@ -268,7 +268,7 @@ String TemporalInfo():
     }
 }
 
-Token BinaryLogicOperator():
+private Token BinaryLogicOperator():
 {
     Token t;
 }
@@ -279,7 +279,7 @@ Token BinaryLogicOperator():
     }
 }
 
-Token BinaryMathComparisonOperator():
+private Token BinaryMathComparisonOperator():
 {
     Token t;
 }
@@ -290,7 +290,7 @@ Token BinaryMathComparisonOperator():
     }
 }
 
-TemporalOperatorInfo BinaryMTLOperator():
+private TemporalOperatorInfo BinaryMTLOperator():
 {
     Token t;
     String temporalInfo = null;

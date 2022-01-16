@@ -14,7 +14,7 @@ class LTLParserTests {
     @Test
     void Value() throws ParseException {
         LTLParser parser = new LTLParser("(proposition)");
-        ASTNode node = parser.ValueOrComparison();
+        ASTNode node = parser.LTL_Formula_File();
 
         ASTTreeComparison.compareAST(new ValueASTNode("(proposition)"), node);
     }
@@ -26,14 +26,14 @@ class LTLParserTests {
         ASTNode value2 = new ValueASTNode("2");
         ASTNode expected = new BinaryOperationASTNode(">", value1, value2);
 
-        ASTNode node = parser.ValueOrComparison();
+        ASTNode node = parser.LTL_Formula_File();
         ASTTreeComparison.compareAST(expected, node);
     }
 
     @Test
     void unaryOperation() throws ParseException {
         LTLParser parser = new LTLParser("!F(do_stuff)");
-        UnaryOperationASTNode node = parser.UnaryOperation();
+        ASTNode node = parser.LTL_Formula_File();
 
         ASTNode value = new ValueASTNode("(do_stuff)");
         UnaryOperationASTNode expectedNested = new UnaryOperationASTNode("F", value);
@@ -45,7 +45,7 @@ class LTLParserTests {
     @Test
     void binaryLTLOperator() throws ParseException {
         LTLParser parser = new LTLParser("(A)&(B)&(C)|(D)&(F)");
-        ASTNode result = parser.LTL_Formula();
+        ASTNode result = parser.LTL_Formula_File();
 
         new ValueASTNode("(A)");
         new ValueASTNode("(B)");
@@ -70,15 +70,15 @@ class LTLParserTests {
     @Test
     void LTL_Formula_returns_correct_type() throws ParseException {
         LTLParser parser = new LTLParser("(A)");
-        ASTNode result = parser.LTL_Formula();
+        ASTNode result = parser.LTL_Formula_File();
         assertTrue(result instanceof ValueASTNode);
 
         parser = new LTLParser("!(A)");
-        result = parser.LTL_Formula();
+        result = parser.LTL_Formula_File();
         assertTrue(result instanceof UnaryOperationASTNode);
 
         parser = new LTLParser("(A)&(B)");
-        result = parser.LTL_Formula();
+        result = parser.LTL_Formula_File();
         assertTrue(result instanceof BinaryOperationASTNode);
 
     }
