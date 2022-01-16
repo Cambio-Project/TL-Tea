@@ -8,32 +8,33 @@ public enum BinaryOperatorPrecedenceMap {
     INSTANCE;
 
     static {
-        HashMap<String, Integer> prepMap = new HashMap<>();
+        HashMap<OperatorToken, Integer> prepMap = new HashMap<>();
 
-        prepMap.put("<LT>", 0);
-        prepMap.put("<LEQ>", 0);
-        prepMap.put("<EQ>", 0);
-        prepMap.put("<NEQ>", 0);
-        prepMap.put("<GT>", 0);
-        prepMap.put("<GEQ>", 0);
+        prepMap.put(OperatorToken.LT, 0);
+        prepMap.put(OperatorToken.LEQ, 0);
+        prepMap.put(OperatorToken.EQ, 0);
+        prepMap.put(OperatorToken.NEQ, 0);
+        prepMap.put(OperatorToken.GT, 0);
+        prepMap.put(OperatorToken.GEQ, 0);
 
-        prepMap.put("<OR>", 1);
-        prepMap.put("<AND>", 2);
+        prepMap.put(OperatorToken.OR, 1);
+        prepMap.put(OperatorToken.AND, 2);
 
-        prepMap.put("<IMPLIES>", 3);
+        prepMap.put(OperatorToken.IMPLIES, 3);
 
-        prepMap.put("<IFF>", 4);
+        prepMap.put(OperatorToken.IFF, 4);
 
-        prepMap.put("<UNTIL_T>", 5);
-        prepMap.put("<RELEASE_T>", 5);
-        prepMap.put("<WEAKUNTIL_T>", 5);
+        prepMap.put(OperatorToken.UNTIL, 5);
+        prepMap.put(OperatorToken.RELEASE, 5);
+        prepMap.put(OperatorToken.WEAKUNTIL, 5);
 
+        //noinspection Java9CollectionFactory
         PRECEDENCE_MAP = Collections.unmodifiableMap(prepMap);
     }
 
-    private final static Map<String, Integer> PRECEDENCE_MAP;
+    private final static Map<OperatorToken, Integer> PRECEDENCE_MAP;
 
-    public int getPrecedence(String operator) {
+    public int getPrecedence(OperatorToken operator) {
 
         Integer precedence;
 
@@ -42,7 +43,7 @@ public enum BinaryOperatorPrecedenceMap {
             System.out.printf("[TL-Tea] Operator '%s' does not have an assigned precedence, defaulting to weakest.%n",
                               operator);
         } else {
-            precedence = PRECEDENCE_MAP.get(TokenImageMap.INSTANCE.getTokenImage(operator));
+            precedence = PRECEDENCE_MAP.get(operator);
         }
 
 
@@ -53,14 +54,14 @@ public enum BinaryOperatorPrecedenceMap {
     /**
      * Checks if the operator has higher precedence than the other operator.
      */
-    public boolean hasHigherPrecedence(String operator, String otherOperator) {
+    public boolean hasHigherPrecedence(OperatorToken operator, OperatorToken otherOperator) {
         return getPrecedence(operator) > getPrecedence(otherOperator);
     }
 
     /**
      * Check if an operator has a precedence rating.
      */
-    public boolean hasPrecedence(String operator) {
+    public boolean hasPrecedence(OperatorToken operator) {
         return PRECEDENCE_MAP.containsKey(operator);
     }
 }

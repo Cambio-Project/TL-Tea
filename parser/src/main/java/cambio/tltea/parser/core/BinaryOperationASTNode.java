@@ -13,8 +13,8 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     protected final int operatorPriority;
 
 
-    public BinaryOperationASTNode(String operator, ASTNode left, ASTNode right) {
-        super(operator);
+    public BinaryOperationASTNode(String operatorImage, ASTNode left, ASTNode right) {
+        super(operatorImage);
         this.left = left;
         this.right = right;
 
@@ -42,7 +42,9 @@ public class BinaryOperationASTNode extends OperatorASTNode {
      */
     public final BinaryOperationASTNode seepIn(IOperatorInfo operatorInfo, ASTNode leftNode) {
 
-        if (operatorPriority > BinaryOperatorPrecedenceMap.INSTANCE.getPrecedence(operatorInfo.operatorImage()) || this.isBracketed()) {
+        if (operatorPriority > BinaryOperatorPrecedenceMap.INSTANCE.getPrecedence(
+                OperatorTokenImageMap.INSTANCE.getToken(operatorInfo.operatorImage()))
+            || this.isBracketed()) {
             BinaryOperationASTNode newParent = null;
             if (operatorInfo instanceof LiteralOperatorInfo info) {
                 newParent = new BinaryOperationASTNode(info.operatorImage(), leftNode, this);

@@ -4,14 +4,14 @@ package cambio.tltea.parser.core;
  * @author Lion Wagner
  */
 public abstract class OperatorASTNode extends ASTNode {
-    protected final String operator;
+    protected final OperatorToken operator;
 
     public OperatorASTNode(String operatorImage) {
         super();
-        this.operator = TokenImageMap.INSTANCE.getTokenImage(operatorImage);
+        this.operator = OperatorTokenImageMap.INSTANCE.getToken(operatorImage);
     }
 
-    public String getOperator() {
+    public OperatorToken getOperator() {
         return operator;
     }
 }
