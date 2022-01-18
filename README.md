@@ -1,4 +1,7 @@
-Maven package: [![](https://jitpack.io/v/Cambio-Project/TL-Tea.svg)](https://jitpack.io/#Cambio-Project/TL-Tea)
+
+[![Maven Build & Test](https://github.com/Cambio-Project/TL-Tea/actions/workflows/maven-build_and_test.yml/badge.svg?branch=main)](https://github.com/Cambio-Project/TL-Tea/actions/workflows/maven-build_and_test.yml)
+
+Maven package@Jitpack  [![](https://jitpack.io/v/Cambio-Project/TL-Tea.svg)](https://jitpack.io/#Cambio-Project/TL-Tea)
 
 ## TL-Tea
 
