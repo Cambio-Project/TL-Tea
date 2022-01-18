@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/Cambio-Project/TL-Tea.svg)](https://jitpack.io/#Cambio-Project/TL-Tea)
+Maven package: [![](https://jitpack.io/v/Cambio-Project/TL-Tea.svg)](https://jitpack.io/#Cambio-Project/TL-Tea)
 
 ## TL-Tea
 
