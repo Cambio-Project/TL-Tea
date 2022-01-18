@@ -36,4 +36,9 @@ public final class ValueASTNode extends ASTNode {
                "value='" + value + '\'' +
                '}';
     }
+
+    @Override
+    public ASTNode clone() {
+        return new ValueASTNode(value);
+    }
 }

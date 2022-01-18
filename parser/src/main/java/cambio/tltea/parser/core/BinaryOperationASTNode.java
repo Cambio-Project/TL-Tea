@@ -13,7 +13,7 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     protected final int operatorPriority;
 
     public BinaryOperationASTNode(OperatorToken operator, ASTNode left, ASTNode right) {
-        this(operator.image, left, right);
+        this(operator.image(), left, right);
     }
 
     public BinaryOperationASTNode(String operatorImage, ASTNode left, ASTNode right) {
@@ -83,6 +83,11 @@ public class BinaryOperationASTNode extends OperatorASTNode {
                "op=" + operator + " ; " +
                "size=" + getSize() +
                '}';
+    }
+
+    @Override
+    public ASTNode clone() {
+        return new BinaryOperationASTNode(operator, left.clone(), right.clone());
     }
 
     @Override

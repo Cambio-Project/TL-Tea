@@ -19,9 +19,10 @@ public enum OperatorToken {
     FINALLY("<FINALLY_T>"),
     UNTIL("<UNTIL_T>"),
     RELEASE("<RELEASE_T>"),
-    WEAKUNTIL("<WEAKUNTIL_T>");
+    WEAKUNTIL("<WEAKUNTIL_T>"),
+    UNKNOWN("<UNKNOWN>");
 
-    public final String image;
+    private String image;
 
     OperatorToken(String image) {
         this.image = image;
@@ -37,5 +38,27 @@ public enum OperatorToken {
             }
         }
         return null;
+    }
+
+    private OperatorToken setImage(String image) {
+        this.image = image;
+        return this;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public String image() {
+        return image;
+    }
+
+    public static OperatorToken UNKNOWN(String image) {
+        return OperatorToken.UNKNOWN.setImage(image);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", this.name(), this.image);
     }
 }

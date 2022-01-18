@@ -1,5 +1,7 @@
 package cambio.tltea.parser.core;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 
 
@@ -32,14 +34,11 @@ public enum OperatorTokenImageMap {
         INSTANCE.put(OperatorToken.WEAKUNTIL, "W", "w");
     }
 
-    private final HashMap<String, String[]> imagesMap = new HashMap<>();
     private final HashMap<String, OperatorToken> tokenResolveMap = new HashMap<>();
 
-    private void put(OperatorToken token, String... images) {
-        imagesMap.put(token.image, images);
-
-        tokenResolveMap.put(token.image, token);//identity
-        tokenResolveMap.put(token.image.replaceAll("[><]", ""), token);//identity
+    private void put(@NotNull OperatorToken token, String... images) {
+        tokenResolveMap.put(token.image(), token);//identity
+        tokenResolveMap.put(token.image().replaceAll("[><]", ""), token);//identity
         for (String image : images) {
             tokenResolveMap.put(image, token);
         }
@@ -57,16 +56,11 @@ public enum OperatorTokenImageMap {
         if (token == null) {
             token = tokenResolveMap.get("<" + image + ">");
         }
+        if (token == null) {
+            var unknownToken = OperatorToken.UNKNOWN(image);
+            INSTANCE.put(unknownToken, image);
+            return unknownToken;
+        }
         return token;
-    }
-
-    /**
-     * Gets all potential token images for the given token.
-     *
-     * @param token
-     * @return
-     */
-    public String[] getImages(String token) {
-        return imagesMap.get(token);
     }
 }

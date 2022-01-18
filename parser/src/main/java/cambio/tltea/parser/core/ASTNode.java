@@ -3,7 +3,7 @@ package cambio.tltea.parser.core;
 /**
  * @author Lion Wagner
  */
-public abstract class ASTNode {
+public abstract class ASTNode implements Cloneable {
 
     protected OperatorASTNode parent;
 
@@ -53,4 +53,13 @@ public abstract class ASTNode {
     public void setBracketed(boolean bracketed) {
         isBracketed = bracketed;
     }
+
+    /**
+     * Creates a deep copy of this node.
+     *
+     * @return a deep copy of this node.
+     */
+    @Override
+    public abstract ASTNode clone();
+
 }

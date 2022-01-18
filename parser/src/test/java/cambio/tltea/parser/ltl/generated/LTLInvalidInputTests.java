@@ -72,4 +72,10 @@ public class LTLInvalidInputTests {
         assertThrowsException("F((AB(EF))");
         assertThrowsException("F((AB)EF))");
     }
+
+    @Test
+    void throws_exception_on_double_negate_empty() {
+        assertThrowsException("!!");
+        assertThrowsException("(a)&!!");
+    }
 }

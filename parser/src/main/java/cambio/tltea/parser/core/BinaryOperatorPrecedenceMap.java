@@ -41,11 +41,10 @@ public enum BinaryOperatorPrecedenceMap {
         if (!hasPrecedence(operator)) {
             precedence = Integer.MIN_VALUE;
             System.out.printf("[TL-Tea] Operator '%s' does not have an assigned precedence, defaulting to weakest.%n",
-                              operator);
+                              operator.toString());
         } else {
             precedence = PRECEDENCE_MAP.get(operator);
         }
-
 
         return precedence;
     }
