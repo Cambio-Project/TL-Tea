@@ -7,7 +7,7 @@
     <name>TL-Tea</name>
     <groupId>cambio.tltea</groupId>
     <artifactId>tltea</artifactId>
-    <version>0.1</version>
+    <version>0.1.1a</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -66,9 +66,9 @@
     
     <distributionManagement>
         <repository>
-          <id>github</id>
-          <name>GitHub Cambio-Project Apache Maven Packages</name>
-          <url>https://maven.pkg.github.com/Cambio-Project/TL-Tea</url>
+            <id>github</id>
+            <name>GitHub Cambio-Project Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Cambio-Project/TL-Tea</url>
         </repository>
     </distributionManagement>
 
