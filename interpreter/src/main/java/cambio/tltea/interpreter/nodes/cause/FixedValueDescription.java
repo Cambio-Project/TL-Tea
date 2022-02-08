@@ -1,4 +1,4 @@
-package cambio.tltea.interpreter.nodes.requirements;
+package cambio.tltea.interpreter.nodes.cause;
 
 /**
  * @author Lion Wagner

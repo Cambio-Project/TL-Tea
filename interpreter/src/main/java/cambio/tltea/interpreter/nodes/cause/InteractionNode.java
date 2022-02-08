@@ -1,4 +1,4 @@
-package cambio.tltea.interpreter.nodes.requirements;
+package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangedPublisher;
 

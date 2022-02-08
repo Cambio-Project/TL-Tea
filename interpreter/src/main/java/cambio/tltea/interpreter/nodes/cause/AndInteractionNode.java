@@ -1,4 +1,4 @@
-package cambio.tltea.interpreter.nodes.requirements;
+package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangedPublisher;
@@ -9,16 +9,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Lion Wagner
  */
-public class OrInteractionNode extends InteractionNode<Boolean> implements InteractionListener<Boolean> {
-
+public class AndInteractionNode extends InteractionNode<Boolean> implements InteractionListener<Boolean> {
     private boolean state = false;
 
     private final LinkedList<StateChangedPublisher<Boolean>> children = new LinkedList<>();
 
     private final AtomicInteger trueCount = new AtomicInteger(0);
 
-    public OrInteractionNode(InteractionNode<Boolean>... children) {
-        for (var child : children) {
+    public AndInteractionNode(InteractionNode<Boolean>... children) {
+        for (InteractionNode<Boolean> child : children) {
             this.children.add(child);
             child.subscribe(this);
 
@@ -26,19 +25,19 @@ public class OrInteractionNode extends InteractionNode<Boolean> implements Inter
                 trueCount.incrementAndGet();
             }
         }
-        state = trueCount.get() > 0;
+        state = trueCount.get() == this.children.size();
     }
 
     @Override
     public void onEvent(StateChangeEvent<Boolean> event) {
-        if (event.getNewValue() != event.getOldValue()) {
+        if (event.getNewValue() != event.getOldValue()) { //stop bounce if there is no change
             if (event.getNewValue()) {
                 trueCount.incrementAndGet();
             } else {
                 trueCount.decrementAndGet();
             }
             boolean oldSate = state;
-            state = trueCount.get() > 0;
+            state = trueCount.get() == this.children.size();
 
             if (oldSate != state) {
                 notifySubscribers(new StateChangeEvent<>(this, true, false));
@@ -50,4 +49,5 @@ public class OrInteractionNode extends InteractionNode<Boolean> implements Inter
     public Boolean getValue() {
         return state;
     }
+
 }

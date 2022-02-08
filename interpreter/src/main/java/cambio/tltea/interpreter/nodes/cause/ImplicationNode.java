@@ -1,4 +1,4 @@
-package cambio.tltea.interpreter.nodes.requirements;
+package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 
@@ -7,16 +7,16 @@ import cambio.tltea.interpreter.nodes.StateChangeEvent;
  */
 public class ImplicationNode extends InteractionNode<Boolean> implements InteractionListener<Boolean> {
 
-    private final InteractionNode<Boolean> requirement;
+    private final InteractionNode<Boolean> cause;
     private final String consequence;
     private final TriggerNotifier notifier;
 
-    public ImplicationNode(InteractionNode<Boolean> requirement, String consequence, TriggerNotifier notifier) {
-        this.requirement = requirement;
+    public ImplicationNode(InteractionNode<Boolean> cause, String consequence, TriggerNotifier notifier) {
+        this.cause = cause;
         this.consequence = consequence;
         this.notifier = notifier;
 
-        requirement.subscribe(this);
+        cause.subscribe(this);
     }
 
     @Override
@@ -27,10 +27,10 @@ public class ImplicationNode extends InteractionNode<Boolean> implements Interac
     }
 
     /**
-     * @return whether the requirement is satisfied
+     * @return whether the cause expression is satisfied
      */
     @Override
     public Boolean getValue() {
-        return requirement.getValue();
+        return cause.getValue();
     }
 }

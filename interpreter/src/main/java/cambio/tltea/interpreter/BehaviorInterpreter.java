@@ -1,6 +1,6 @@
 package cambio.tltea.interpreter;
 
-import cambio.tltea.interpreter.nodes.requirements.*;
+import cambio.tltea.interpreter.nodes.cause.*;
 import cambio.tltea.interpreter.utils.ASTManipulator;
 import cambio.tltea.parser.core.*;
 
@@ -21,44 +21,44 @@ class BehaviorInterpreter {
     public BehaviorInterpretationResult interpret(ASTNode ast) {
         var workCopy = ast.clone();
         result.setModifiedAST(workCopy);
-        var interpretedAST = interpretAsRequirement(workCopy);
+        var interpretedAST = interpretAsCause(workCopy);
         result.setInterpretedAST(interpretedAST);
         return result;
     }
 
 
-    private InteractionNode<?> interpretAsRequirement(ASTNode root) {
+    private InteractionNode<?> interpretAsCause(ASTNode root) {
         if (root instanceof ValueASTNode valueNode) {
-            return interpretAsRequirement(valueNode);
+            return interpretAsCause(valueNode);
         } else if (root instanceof UnaryOperationASTNode unNode) {
-            return interpretAsRequirement(unNode);
+            return interpretAsCause(unNode);
         } else if (root instanceof BinaryOperationASTNode biNode) {
-            return interpretAsRequirement(biNode);
+            return interpretAsCause(biNode);
         }
         return null;
     }
 
-    private InteractionNode<Boolean> interpretAsRequirement(UnaryOperationASTNode unNode) {
+    private InteractionNode<Boolean> interpretAsCause(UnaryOperationASTNode unNode) {
         switch (unNode.getOperator()) {
             case NOT -> {
                 if (unNode.getChild() instanceof UnaryOperationASTNode child
                     && child.getOperator() == OperatorToken.NOT) {
-                    interpretAsRequirement(ASTManipulator.removeDoubleNot(unNode));
+                    interpretAsCause(ASTManipulator.removeDoubleNot(unNode));
                 }//TODO: replace !true / !false with false / true
-                var child = interpretAsRequirement(unNode.getChild());
+                var child = interpretAsCause(unNode.getChild());
                 return new NotInteractionNode((InteractionNode<Boolean>) child);
             }
             default -> throw new UnsupportedOperationException("Operator not yet supported: " + unNode.getOperator());
         }
     }
 
-    private InteractionNode<Boolean> interpretAsRequirement(BinaryOperationASTNode binaryNode) {
+    private InteractionNode<Boolean> interpretAsCause(BinaryOperationASTNode binaryNode) {
         switch (binaryNode.getOperator()) {
             case IFF: {
-                interpretAsRequirement(ASTManipulator.splitIFF(binaryNode));
+                interpretAsCause(ASTManipulator.splitIFF(binaryNode));
             }
             case IMPLIES: {
-                var left = (InteractionNode<Boolean>) interpretAsRequirement(binaryNode.getLeftChild());
+                var left = (InteractionNode<Boolean>) interpretAsCause(binaryNode.getLeftChild());
                 var right = interpretAsBehavior(binaryNode.getRightChild());
                 return new ImplicationNode(left, right, result.getTriggerNotifier());
             }
@@ -76,7 +76,7 @@ class BehaviorInterpreter {
         }
     }
 
-    private InteractionNode<?> interpretAsRequirement(ValueASTNode valueNode) {
+    private InteractionNode<?> interpretAsCause(ValueASTNode valueNode) {
         try {
             double d = Double.parseDouble(valueNode.getValue());
             return new FixedValueDescription<>(d);
@@ -103,13 +103,13 @@ class BehaviorInterpreter {
         if (root.getLeftChild() instanceof BinaryOperationASTNode leftChild && leftChild.getOperator() == root.getOperator()) {
             children.addAll(flattenRequirement(leftChild));
         } else {
-            children.add((InteractionNode<Boolean>) interpretAsRequirement(root.getLeftChild()));
+            children.add((InteractionNode<Boolean>) interpretAsCause(root.getLeftChild()));
         }
 
         if (root.getRightChild() instanceof BinaryOperationASTNode rightChild && rightChild.getOperator() == root.getOperator()) {
             children.addAll(flattenRequirement(rightChild));
         } else {
-            children.add((InteractionNode<Boolean>) interpretAsRequirement(root.getRightChild()));
+            children.add((InteractionNode<Boolean>) interpretAsCause(root.getRightChild()));
         }
 
         return children;
