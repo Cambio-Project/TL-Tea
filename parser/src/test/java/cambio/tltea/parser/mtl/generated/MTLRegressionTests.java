@@ -26,7 +26,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode = new BinaryOperationASTNode("→", value1, finallyNode);
         ASTNode unaryNode = new TemporalUnaryOperationASTNode("☐", binaryNode);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(unaryNode, root2);
     }
 
@@ -40,7 +40,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode = new BinaryOperationASTNode("→", value1, finallyNode);
         ASTNode unaryNode = new TemporalUnaryOperationASTNode("☐", binaryNode);
 
-        ASTTreeComparison.compareAST(unaryNode, parser.MTL_Formula_File());
+        ASTTreeComparison.compareAST(unaryNode, parser.parse());
     }
 
     /**
@@ -65,7 +65,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode2 = new BinaryOperationASTNode("→", value1, unaryNode2);
         ASTNode unaryNode3 = new TemporalUnaryOperationASTNode("☐", binaryNode2);
 
-        ASTTreeComparison.compareAST(unaryNode3, parser.MTL_Formula_File());
+        ASTTreeComparison.compareAST(unaryNode3, parser.parse());
     }
 
 
@@ -87,7 +87,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode = new BinaryOperationASTNode("→", value1, unaryNode);
         ASTNode unaryNode2 = new TemporalUnaryOperationASTNode("☐", binaryNode);
 
-        ASTTreeComparison.compareAST(unaryNode2, parser.MTL_Formula_File());
+        ASTTreeComparison.compareAST(unaryNode2, parser.parse());
     }
 
     /**
@@ -110,7 +110,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode2 = new BinaryOperationASTNode("∧", value1, unaryNode2);
         ASTNode unaryNode3 = new TemporalUnaryOperationASTNode("☐", binaryNode2);
 
-        ASTTreeComparison.compareAST(unaryNode3, parser.MTL_Formula_File());
+        ASTTreeComparison.compareAST(unaryNode3, parser.parse());
     }
 
     /**
@@ -130,7 +130,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode3 = new BinaryOperationASTNode("&", binaryNode, binaryNode2);
         ASTNode unaryNode2 = new UnaryOperationASTNode("!", binaryNode3);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(unaryNode2, root2);
     }
 
@@ -149,7 +149,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode2 = new BinaryOperationASTNode("|", value3, value4);
         ASTNode binaryNode3 = new BinaryOperationASTNode("&", binaryNode, binaryNode2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode3, root2);
     }
 
@@ -167,7 +167,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode = new BinaryOperationASTNode("|", value2, value3);
         ASTNode binaryNode2 = new BinaryOperationASTNode("&", value1, binaryNode);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode2, root2);
     }
 
@@ -182,7 +182,7 @@ public class MTLRegressionTests {
         ASTNode value2 = new ValueASTNode("(S)");
         ASTNode binaryNode = new TemporalBinaryOperationASTNode("U", value1, value2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode, root2);
     }
 
@@ -198,7 +198,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode = new TemporalBinaryOperationASTNode("U", value1, value2);
         ASTNode unaryNode = new TemporalUnaryOperationASTNode("☐", binaryNode);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(unaryNode, root2);
     }
 
@@ -213,7 +213,7 @@ public class MTLRegressionTests {
         ASTNode value2 = new ValueASTNode("(P)");
         ASTNode binaryNode = new TemporalBinaryOperationASTNode("U", value1, value2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode, root2);
     }
 
@@ -228,7 +228,7 @@ public class MTLRegressionTests {
         ASTNode value2 = new ValueASTNode("(P)");
         ASTNode binaryNode = new TemporalBinaryOperationASTNode("R", value1, value2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode, root2);
     }
 
@@ -243,7 +243,7 @@ public class MTLRegressionTests {
         ASTNode value2 = new ValueASTNode("(P)");
         ASTNode binaryNode = new TemporalBinaryOperationASTNode("W", value1, value2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode, root2);
     }
 
@@ -258,7 +258,7 @@ public class MTLRegressionTests {
         ASTNode value2 = new ValueASTNode("1");
         ASTNode binaryNode = new BinaryOperationASTNode(">", value1, value2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode, root2);
     }
 
@@ -273,7 +273,7 @@ public class MTLRegressionTests {
         ASTNode value2 = new ValueASTNode("(a)");
         ASTNode binaryNode = new BinaryOperationASTNode("<", value1, value2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode, root2);
     }
 
@@ -288,7 +288,7 @@ public class MTLRegressionTests {
         ASTNode value2 = new ValueASTNode("42");
         ASTNode binaryNode = new BinaryOperationASTNode("<=", value1, value2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode, root2);
     }
 
@@ -305,7 +305,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode = new BinaryOperationASTNode("!=", value1, value2);
         ASTNode unaryNode = new UnaryOperationASTNode("!", binaryNode);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(unaryNode, root2);
     }
 
@@ -325,7 +325,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode2 = new BinaryOperationASTNode(">=", value3, value4);
         ASTNode binaryNode3 = new BinaryOperationASTNode("|", binaryNode1, binaryNode2);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode3, root2);
     }
 
@@ -342,7 +342,7 @@ public class MTLRegressionTests {
         ASTNode value3 = new ValueASTNode("(c)");
         ASTNode binaryNode2 = new BinaryOperationASTNode("|", binaryNode1, value3);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(binaryNode2, root2);
     }
 
@@ -358,7 +358,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode = new BinaryOperationASTNode("==", value1, value2);
         ASTNode unaryNode = new TemporalUnaryOperationASTNode(new TemporalOperatorInfo("G","[event]"), binaryNode);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(unaryNode, root2);
     }
 
@@ -381,7 +381,7 @@ public class MTLRegressionTests {
         ASTNode binaryNode3 = new BinaryOperationASTNode("->", binaryNode1, unaryNode1);
         ASTNode unaryNode2 = new TemporalUnaryOperationASTNode("G", binaryNode3);
 
-        ASTNode root2 = parser.MTL_Formula_File();
+        ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(unaryNode2, root2);
     }
 }

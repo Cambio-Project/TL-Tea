@@ -18,7 +18,7 @@ class ASTTreeWalkerTest {
 
     @Test
     void outputs_correct_preorder() throws ParseException {
-        LTLParser parser = new LTLParser("☐((P) → ☐ (S))");
+        ASTNode tree = LTLParser.parse("☐((P) → ☐ (S))");
 
         ASTNode value1 = new ValueASTNode("(P)");
         ASTNode value2 = new ValueASTNode("(S)");
@@ -33,15 +33,13 @@ class ASTTreeWalkerTest {
         expected.add(unaryNode);
         expected.add(value2);
 
-
-        ASTNode tree = parser.LTL_Formula_File();
         List<ASTNode> nodes = toList(tree, ASTTreeWalker::walkPreOrder);
         compareNodeListShallow(expected, nodes);
     }
 
     @Test
     void outputs_correct_inorder() throws ParseException {
-        LTLParser parser = new LTLParser("☐((P) → ☐ (S))");
+        ASTNode tree =  LTLParser.parse("☐((P) → ☐ (S))");
 
         ASTNode value1 = new ValueASTNode("(P)");
         ASTNode value2 = new ValueASTNode("(S)");
@@ -56,15 +54,13 @@ class ASTTreeWalkerTest {
         expected.add(unaryNode);
         expected.add(value2);
 
-
-        ASTNode tree = parser.LTL_Formula_File();
         List<ASTNode> nodes = toList(tree, ASTTreeWalker::walkInOrder);
         compareNodeListShallow(expected, nodes);
     }
 
     @Test
     void outputs_correct_postorder() throws ParseException {
-        LTLParser parser = new LTLParser("☐((P) → ☐ (S))");
+        ASTNode tree =  LTLParser.parse("☐((P) → ☐ (S))");
 
         ASTNode PValue = new ValueASTNode("(P)");
         ASTNode SValue = new ValueASTNode("(S)");
@@ -79,8 +75,6 @@ class ASTTreeWalkerTest {
         expected.add(SValue);
         expected.add(implies);
 
-
-        ASTNode tree = parser.LTL_Formula_File();
         List<ASTNode> nodes = toList(tree, ASTTreeWalker::walkPostOrder);
         compareNodeListShallow(expected, nodes);
     }

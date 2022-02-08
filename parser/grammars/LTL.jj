@@ -31,6 +31,39 @@ public class LTLParser {
         }
         LTLParser parser = new LTLParser(input,"UTF-8");
     }
+    
+    
+    private static final LTLParser staticParser = new LTLParser("");
+
+    /**
+    * Parses the given LTL formula into an Abstract Syntax Tree.
+    *
+    * @param input The LTL formula to parse.
+    * @return The root node of the resulting AST.
+    * @throws ParseException If the formula is not well-formed.
+    * @see #tryParse(String)
+    */
+    public static ASTNode parse(String input) throws ParseException {
+        staticParser.ReInit(input);
+        return staticParser.parse();
+    }
+
+    /**
+    * Tries to parse the given input {@code String} into an Abstract Syntax Tree returns the resulting {@code ASTNode} root node or null.
+    *
+    * @param input LTL formula to parse
+    * @return the resulting {@code ASTNode} root node or null if an exception occurs
+    * @see #parse(String) for a variant that throws exceptions
+    */
+    public static ASTNode tryParse(String input){
+        try{
+          return  LTLParser.parse(input);
+        }
+        catch (ParseException e){
+            return null;
+        }
+    }
+    
 
     /**
     * Creates a new parser for the given input string.
@@ -108,7 +141,7 @@ TOKEN :
 * @return the root node of the LTL formulas' AST
 * @throws ParseException if the formula is not well-formed or empty
 */
-ASTNode LTL_Formula_File():
+ASTNode parse():
 {
    ASTNode root = null;
 }

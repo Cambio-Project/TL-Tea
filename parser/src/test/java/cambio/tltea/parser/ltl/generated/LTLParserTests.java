@@ -13,9 +13,7 @@ class LTLParserTests {
 
     @Test
     void Value() throws ParseException {
-        LTLParser parser = new LTLParser("(proposition)");
-        ASTNode node = parser.LTL_Formula_File();
-
+        ASTNode node = LTLParser.parse("(proposition)");
         ASTTreeComparison.compareAST(new ValueASTNode("(proposition)"), node);
     }
 
@@ -26,14 +24,14 @@ class LTLParserTests {
         ASTNode value2 = new ValueASTNode("2");
         ASTNode expected = new BinaryOperationASTNode(">", value1, value2);
 
-        ASTNode node = parser.LTL_Formula_File();
+        ASTNode node = parser.parse();
         ASTTreeComparison.compareAST(expected, node);
     }
 
     @Test
     void unaryOperation() throws ParseException {
         LTLParser parser = new LTLParser("!F(do_stuff)");
-        ASTNode node = parser.LTL_Formula_File();
+        ASTNode node = parser.parse();
 
         ASTNode value = new ValueASTNode("(do_stuff)");
         UnaryOperationASTNode expectedNested = new UnaryOperationASTNode("F", value);
@@ -45,7 +43,7 @@ class LTLParserTests {
     @Test
     void binaryLTLOperator() throws ParseException {
         LTLParser parser = new LTLParser("(A)&(B)&(C)|(D)&(F)");
-        ASTNode result = parser.LTL_Formula_File();
+        ASTNode result = parser.parse();
 
         new ValueASTNode("(A)");
         new ValueASTNode("(B)");
@@ -70,15 +68,15 @@ class LTLParserTests {
     @Test
     void LTL_Formula_returns_correct_type() throws ParseException {
         LTLParser parser = new LTLParser("(A)");
-        ASTNode result = parser.LTL_Formula_File();
+        ASTNode result = parser.parse();
         assertTrue(result instanceof ValueASTNode);
 
         parser = new LTLParser("!(A)");
-        result = parser.LTL_Formula_File();
+        result = parser.parse();
         assertTrue(result instanceof UnaryOperationASTNode);
 
         parser = new LTLParser("(A)&(B)");
-        result = parser.LTL_Formula_File();
+        result = parser.parse();
         assertTrue(result instanceof BinaryOperationASTNode);
 
     }
@@ -86,13 +84,13 @@ class LTLParserTests {
     @Test
     void unmatchedBracketsTest() throws ParseException {
         LTLParser parser = new LTLParser("(((A))");
-        assertThrows(ParseException.class, parser::LTL_Formula_File);
+        assertThrows(ParseException.class, parser::parse);
     }
 
     @Test
     void allows_basic_bracketing() throws ParseException {
         LTLParser parser = new LTLParser("((((A))))");
-        ASTNode result = parser.LTL_Formula_File();
+        ASTNode result = parser.parse();
         ASTNode expected = new ValueASTNode("(A)");
 
         ASTTreeComparison.compareAST(expected, result);
@@ -101,7 +99,7 @@ class LTLParserTests {
     @Test
     void allows_basic_bracketing2() throws ParseException {
         LTLParser parser = new LTLParser("(((!(A))))");
-        ASTNode result = parser.LTL_Formula_File();
+        ASTNode result = parser.parse();
         ASTNode expected = new UnaryOperationASTNode("!", new ValueASTNode("(A)"));
         ASTTreeComparison.compareAST(expected, result);
     }
@@ -109,7 +107,7 @@ class LTLParserTests {
     @Test
     void allows_basic_bracketing3() throws ParseException {
         LTLParser parser = new LTLParser("!((A))");
-        ASTNode result = parser.LTL_Formula_File();
+        ASTNode result = parser.parse();
         ASTNode expected = new UnaryOperationASTNode("!", new ValueASTNode("(A)"));
         ASTTreeComparison.compareAST(expected, result);
     }

@@ -1,11 +1,11 @@
 package cambio.tltea.parser.ltl.generated;
 
+import cambio.tltea.parser.core.ASTNode;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Lion Wagner
@@ -14,11 +14,16 @@ public class LTLInvalidInputTests {
 
     private static void assertThrowsException(String s) {
         LTLParser parser = new LTLParser(s);
-        Exception ex = assertThrows(Exception.class, parser::LTL_Formula_File);
+        Exception ex = assertThrows(Exception.class, parser::parse);
         assertTrue(ex instanceof ParseException || ex instanceof TokenMgrException);
         parser.ReInit(s);
     }
 
+    @Test
+    void silently_catches_exceptions(){
+        ASTNode parser = LTLParser.tryParse("((A)");
+        assertNull(parser);
+    }
 
     @Test
     void throws_exception_on_empty_input() {

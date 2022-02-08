@@ -19,6 +19,10 @@ import cambio.tltea.parser.core.temporal.*;
 /**
 * MTL parser class.
 *
+* Grammar based on PSP-Wizard output.
+*
+*
+* @see <a href="https://github.com/SoftwareEngineeringToolDemos/FSE-2011-PSPWizard">PSP-Wizard</a>
 * @see <a href="https://www.cis.upenn.edu/~alur/JACM94.pdf">RAJEEV ALUR AND THOMAS A. HENZINGER: A Really Temporal Logic. </a>                                                     </a>
 */
 public class MTLParser {
@@ -34,6 +38,38 @@ public class MTLParser {
         MTLParser parser = new MTLParser(input,"UTF-8");
     }
 
+    private static final MTLParser staticParser = new MTLParser("");
+
+    /**
+    * Parses the given MTL formula into an Abstract Syntax Tree.
+    *
+    * @param input The MTL formula to parse.
+    * @return The root node of the resulting AST.
+    * @throws ParseException If the formula is not well-formed.
+    * @see #tryParse(String)
+    */
+    public static ASTNode parse(String input) throws ParseException {
+        staticParser.ReInit(input);
+        return staticParser.parse();
+    }
+
+    /**
+    * Tries to parse the given input {@code String} into an Abstract Syntax Tree returns the resulting {@code ASTNode} root node or null.
+    *
+    * @param input MTL formula to parse
+    * @return the resulting {@code ASTNode} root node or null if an exception occurs
+    * @see #parse(String) for a variant that throws exceptions
+    */
+    public static ASTNode tryParse(String input){
+        try{
+          return  MTLParser.parse(input);
+        }
+        catch (ParseException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
     * Creates a new parser for the given input string.
     * Assumes UTF-8 encoding.
@@ -46,11 +82,10 @@ public class MTLParser {
     /**
     * Reinitialize the parser. Assumes UTF-8 encoding.
     *
-    *
     * For other encodings see {@link #ReInit(java.io.InputStream, String)}.
     */
-    public void ReInit(String s){
-        this.ReInit(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)),"UTF-8");
+    public void ReInit(String mtlFormula){
+        this.ReInit(new ByteArrayInputStream(mtlFormula.getBytes(StandardCharsets.UTF_8)),"UTF-8");
     }
 }
 
@@ -116,7 +151,7 @@ TOKEN :
 * @return the root node of the MTL formulas' AST
 * @throws ParseException if the formula is not well-formed or empty
 */
-ASTNode MTL_Formula_File():
+ASTNode parse():
 {
    ASTNode root = null;
 }
