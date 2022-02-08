@@ -1,5 +1,6 @@
 package cambio.tltea.interpreter;
 
+import cambio.tltea.interpreter.nodes.TriggerNotifier;
 import cambio.tltea.interpreter.nodes.cause.*;
 import cambio.tltea.interpreter.utils.ASTManipulator;
 import cambio.tltea.parser.core.*;

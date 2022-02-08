@@ -1,4 +1,4 @@
-package cambio.tltea.interpreter.nodes.cause;
+package cambio.tltea.interpreter.nodes;
 
 @FunctionalInterface
 public interface ITriggerListener {

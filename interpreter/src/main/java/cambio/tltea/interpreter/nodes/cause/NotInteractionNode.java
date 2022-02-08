@@ -1,11 +1,12 @@
 package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
+import cambio.tltea.interpreter.nodes.StateChangeListener;
 
 /**
  * @author Lion Wagner
  */
-public final class NotInteractionNode extends InteractionNode<Boolean> implements InteractionListener<Boolean> {
+public final class NotInteractionNode extends InteractionNode<Boolean> implements StateChangeListener<Boolean> {
 
     private final InteractionNode<Boolean> child;
 

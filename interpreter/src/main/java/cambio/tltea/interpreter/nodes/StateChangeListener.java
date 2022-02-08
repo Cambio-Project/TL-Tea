@@ -1,8 +1,8 @@
-package cambio.tltea.interpreter.nodes.cause;
+package cambio.tltea.interpreter.nodes;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 
 @FunctionalInterface
-public interface InteractionListener<T>{
+public interface StateChangeListener<T>{
     void onEvent(StateChangeEvent<T> event);
 }

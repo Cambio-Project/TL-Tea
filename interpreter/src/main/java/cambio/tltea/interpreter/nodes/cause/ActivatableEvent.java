@@ -2,12 +2,13 @@ package cambio.tltea.interpreter.nodes.cause;
 
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
+import cambio.tltea.interpreter.nodes.StateChangeListener;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Lion Wagner
  */
-public final class ActivatableEvent extends IValueDescription<Boolean> implements InteractionListener<Boolean> {
+public final class ActivatableEvent extends IValueDescription<Boolean> implements StateChangeListener<Boolean> {
 
     private final EventActivationListener listener;
 

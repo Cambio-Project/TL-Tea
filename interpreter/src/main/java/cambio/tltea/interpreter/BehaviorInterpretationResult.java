@@ -2,7 +2,7 @@ package cambio.tltea.interpreter;
 
 import cambio.tltea.interpreter.nodes.cause.EventActivationListener;
 import cambio.tltea.interpreter.nodes.cause.InteractionNode;
-import cambio.tltea.interpreter.nodes.cause.TriggerNotifier;
+import cambio.tltea.interpreter.nodes.TriggerNotifier;
 import cambio.tltea.parser.core.ASTNode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

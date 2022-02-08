@@ -1,4 +1,4 @@
-package cambio.tltea.interpreter.nodes.cause;
+package cambio.tltea.interpreter.nodes;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,7 +18,7 @@ public class TriggerNotifier {
         subscribers.remove(listener);
     }
 
-    void trigger(String eventName, Object... args) {
+    public void trigger(String eventName, Object... args) {
         for (ITriggerListener listener : subscribers) {
             listener.onTrigger(eventName, args);
         }
