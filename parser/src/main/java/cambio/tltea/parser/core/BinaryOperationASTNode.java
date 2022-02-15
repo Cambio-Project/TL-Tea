@@ -32,7 +32,7 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     }
 
     public BinaryOperationASTNode(LiteralOperatorInfo operator, ASTNode left, ASTNode right) {
-        this(operator.operatorImage(), left, right);
+        this(operator.operator(), left, right);
     }
 
 
@@ -45,12 +45,11 @@ public class BinaryOperationASTNode extends OperatorASTNode {
      */
     public final BinaryOperationASTNode seepIn(IOperatorInfo operatorInfo, ASTNode leftNode) {
 
-        if (operatorPriority > BinaryOperatorPrecedenceMap.INSTANCE.getPrecedence(
-                OperatorTokenImageMap.INSTANCE.getToken(operatorInfo.operatorImage()))
+        if (operatorPriority > BinaryOperatorPrecedenceMap.INSTANCE.getPrecedence(operatorInfo.operator())
             || this.isBracketed()) {
             BinaryOperationASTNode newParent = null;
             if (operatorInfo instanceof LiteralOperatorInfo info) {
-                newParent = new BinaryOperationASTNode(info.operatorImage(), leftNode, this);
+                newParent = new BinaryOperationASTNode(info.operator(), leftNode, this);
             } else if (operatorInfo instanceof TemporalOperatorInfo info) {
                 newParent = new TemporalBinaryOperationASTNode(info, leftNode, this);
             }
@@ -65,7 +64,7 @@ public class BinaryOperationASTNode extends OperatorASTNode {
             } else {
                 BinaryOperationASTNode newChild = null;
                 if (operatorInfo instanceof LiteralOperatorInfo info) {
-                    newChild = new BinaryOperationASTNode(info.operatorImage(), leftNode, left);
+                    newChild = new BinaryOperationASTNode(info.operator(), leftNode, left);
                 }
                 if (operatorInfo instanceof TemporalOperatorInfo info) {
                     newChild = new TemporalBinaryOperationASTNode(info, leftNode, left);

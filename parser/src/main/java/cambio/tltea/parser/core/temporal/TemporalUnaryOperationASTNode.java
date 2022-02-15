@@ -1,6 +1,7 @@
 package cambio.tltea.parser.core.temporal;
 
 import cambio.tltea.parser.core.ASTNode;
+import cambio.tltea.parser.core.OperatorToken;
 import cambio.tltea.parser.core.UnaryOperationASTNode;
 
 /**
@@ -15,8 +16,12 @@ public final class TemporalUnaryOperationASTNode extends UnaryOperationASTNode i
         this.setTemporalExpressionValue("[0, ∞]");
     }
 
+    public TemporalUnaryOperationASTNode(OperatorToken operator, ASTNode child) {
+        this(operator.image(), child);
+    }
+
     public TemporalUnaryOperationASTNode(TemporalOperatorInfo operatorInfo, ASTNode child) {
-        this(operatorInfo.operatorImage(), child);
+        this(operatorInfo.operator(), child);
         this.setTemporalExpressionValue(operatorInfo.temporalValueExpression());
     }
 

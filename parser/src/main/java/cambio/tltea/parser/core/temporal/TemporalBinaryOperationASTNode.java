@@ -16,7 +16,7 @@ public final class TemporalBinaryOperationASTNode extends BinaryOperationASTNode
     }
 
     public TemporalBinaryOperationASTNode(TemporalOperatorInfo operatorInfo, ASTNode left, ASTNode right) {
-        super(operatorInfo.operatorImage(), left, right);
+        super(operatorInfo.operator(), left, right);
         this.setTemporalExpressionValue(operatorInfo.temporalValueExpression());
     }
 
