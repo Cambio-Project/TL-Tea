@@ -1,8 +1,14 @@
 package cambio.tltea.parser.core.temporal;
 
 import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class TemporalPropositionParser {
+
+
+    private static final List<String> infList = List.of("inf", "infinity", "∞");
 
     public static ITemporalValue parse(String expression) {
         expression = stripBrackets(expression.trim()); // trim and remove brackets
@@ -13,36 +19,41 @@ public final class TemporalPropositionParser {
         } catch (NumberFormatException e) {
         }
 
-        // check if it is a directional time value
+        // check if it is a relative time value and parse it to an instance or interval
         try {
             if (expression.startsWith("=")) {
                 return new TimeInstance(Double.parseDouble(expression.substring(1)));
             } else if (expression.startsWith(">=")) {
-                return new DoubleInterval(Double.parseDouble(expression.substring(2)), Double.POSITIVE_INFINITY);
+                return new TemporalInterval(Double.parseDouble(expression.substring(2)), Double.POSITIVE_INFINITY);
             } else if (expression.startsWith(">")) {
-                return new DoubleInterval(Double.parseDouble(expression.substring(1)), Double.POSITIVE_INFINITY, false);
+                return new TemporalInterval(Double.parseDouble(expression.substring(1)), Double.POSITIVE_INFINITY, false);
             } else if (expression.startsWith("<=")) {
-                return new DoubleInterval(0, Double.parseDouble(expression.substring(2)));
+                return new TemporalInterval(0, Double.parseDouble(expression.substring(2)));
             } else if (expression.startsWith("<")) {
-                return new DoubleInterval(0, Double.parseDouble(expression.substring(1)), true, false);
+                return new TemporalInterval(0, Double.parseDouble(expression.substring(1)), true, false);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
         }
 
+
+        //create pattern for <decimal number>[,;:]<decimal number>
+        Pattern pattern = Pattern.compile("(\\d+\\.?\\d*)([,;:])(\\+?((\\d+\\.?\\d*)|(inf|infinity|∞)))");
+        Matcher matcher = pattern.matcher(expression.toLowerCase().replaceAll("\s", ""));
+
+
         // check if it is an interval description
-        if (expression.contains(",")) {
-            String[] parts = expression.toLowerCase().replaceAll("\s", "").split(",");
-            try {
-                //remove + from the start of parts[1]
-                if (parts[1].startsWith("+")) {
-                    parts[1] = parts[1].substring(1);
-                }
-                List<String> infList = List.of("inf", "infinity", "∞");
-                if (infList.contains(parts[1])) {
-                    return new DoubleInterval(Double.parseDouble(parts[0]), Double.POSITIVE_INFINITY);
-                } else return new DoubleInterval(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
-            } catch (NumberFormatException e) {
+
+        if (matcher.matches()) {
+            MatchResult result = matcher.toMatchResult();
+            //remove starting + from result.group(3) if it exists
+            String secondNumber = result.group(3).startsWith("+") ? result.group(3).substring(1) : result.group(3);
+
+            if (infList.contains(secondNumber)) {
+                return new TemporalInterval(Double.parseDouble(result.group(1)), Double.POSITIVE_INFINITY);
+            } else {
+                return new TemporalInterval(Double.parseDouble(result.group(1)), Double.parseDouble(result.group(3)));
             }
+
         }
 
         // otherwise,  return a TemporalEventDescription wrapper
