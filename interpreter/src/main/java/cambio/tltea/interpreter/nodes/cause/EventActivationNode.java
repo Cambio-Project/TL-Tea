@@ -3,16 +3,17 @@ package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangeListener;
+import cambio.tltea.interpreter.nodes.TriggerNotifier;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Lion Wagner
  */
-public final class ActivatableEvent extends IValueDescription<Boolean> implements StateChangeListener<Boolean> {
+public final class EventActivationNode extends ValueProvider<Boolean> implements StateChangeListener<Boolean> {
 
     private final EventActivationListener listener;
 
-    public ActivatableEvent(String eventName) {
+    public EventActivationNode(String eventName) {
         listener = new EventActivationListener(eventName);
         listener.subscribe(this);
     }
@@ -22,12 +23,12 @@ public final class ActivatableEvent extends IValueDescription<Boolean> implement
     }
 
     @Override
-    public @NotNull Boolean getValue() {
+    public @NotNull Boolean getCurrentValue() {
         return listener.isActivated();
     }
 
     @Override
     public void onEvent(StateChangeEvent<Boolean> event) {
-        notifySubscribers(new StateChangeEvent<>(this, event.getNewValue(), event.getOldValue()));
+        notifySubscribers(new StateChangeEvent<>(this, event.getNewValue(), event.getOldValue(), event.when()));
     }
 }

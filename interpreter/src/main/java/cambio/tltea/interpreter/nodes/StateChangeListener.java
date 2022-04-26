@@ -1,6 +1,6 @@
 package cambio.tltea.interpreter.nodes;
 
-import cambio.tltea.interpreter.nodes.StateChangeEvent;
+import cambio.tltea.parser.core.temporal.ITemporalValue;
 
 @FunctionalInterface
 public interface StateChangeListener<T>{

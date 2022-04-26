@@ -20,8 +20,17 @@ public final class TemporalInterval implements ITemporalValue {
     public TemporalInterval(double start, double end, boolean startInclusive, boolean endInclusive) {
         this.start = start;
         this.end = end;
-        this.startInclusive = startInclusive;
-        this.endInclusive = endInclusive;
+        this.startInclusive = startInclusive && start != Double.NEGATIVE_INFINITY;
+        this.endInclusive = endInclusive && end != Double.POSITIVE_INFINITY;
+
+        if (start > end) {
+            throw new IllegalArgumentException("Start value must be less than end value");
+        }
+        else if (start == end) {
+            if (!startInclusive || !endInclusive) {
+                throw new IllegalArgumentException("Start and end values must be equal if they are not inclusive");
+            }
+        }
     }
 
     public Double getStart() {

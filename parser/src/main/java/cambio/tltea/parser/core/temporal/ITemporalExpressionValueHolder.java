@@ -2,7 +2,11 @@ package cambio.tltea.parser.core.temporal;
 
 public interface ITemporalExpressionValueHolder {
 
-    public void setTemporalExpressionValue(String temporalValueExpression);
+    default void setTemporalExpressionValue(String temporalValueExpression){
+        setTemporalExpressionValue(TemporalPropositionParser.parse(temporalValueExpression));
+    }
+
+    void setTemporalExpressionValue(ITemporalValue temporalValueExpression);
 
     ITemporalValue getTemporalValue();
 

@@ -21,6 +21,11 @@ public final class ValueASTNode extends ASTNode {
     }
 
     @Override
+    public int getTreeWidth() {
+        return 1;
+    }
+
+    @Override
     public int getChildrenCount() {
         return 0;
     }
@@ -35,6 +40,11 @@ public final class ValueASTNode extends ASTNode {
         return "ValueASTNode{" +
                "value='" + value + '\'' +
                '}';
+    }
+
+    @Override
+    public String toFormulaString() {
+        return value;
     }
 
     @Override

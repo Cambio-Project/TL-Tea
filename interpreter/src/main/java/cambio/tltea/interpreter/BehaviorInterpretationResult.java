@@ -1,7 +1,7 @@
 package cambio.tltea.interpreter;
 
 import cambio.tltea.interpreter.nodes.cause.EventActivationListener;
-import cambio.tltea.interpreter.nodes.cause.InteractionNode;
+import cambio.tltea.interpreter.nodes.cause.CauseNode;
 import cambio.tltea.interpreter.nodes.TriggerNotifier;
 import cambio.tltea.parser.core.ASTNode;
 import org.jetbrains.annotations.Contract;
@@ -17,13 +17,13 @@ import java.util.Objects;
  */
 public final class BehaviorInterpretationResult {
     private ASTNode modifiedAST;
-    private InteractionNode<?> interpretedAST;
+    private CauseNode<?> interpretedAST;
     private List<EventActivationListener> listeners;
     private TriggerNotifier triggerNotifier;
 
     /**
      */
-    public BehaviorInterpretationResult(ASTNode modifiedAST, InteractionNode<?> interpretedAST,
+    public BehaviorInterpretationResult(ASTNode modifiedAST, CauseNode<?> interpretedAST,
                                         List<EventActivationListener> listeners,
                                         TriggerNotifier triggerNotifier) {
         this.modifiedAST = modifiedAST;
@@ -65,11 +65,11 @@ public final class BehaviorInterpretationResult {
         this.modifiedAST = modifiedAST;
     }
 
-    public InteractionNode<?> getInterpretedAST() {
+    public CauseNode<?> getInterpretedAST() {
         return interpretedAST;
     }
 
-    void setInterpretedAST(InteractionNode<?> interpretedAST) {
+    void setInterpretedAST(CauseNode<?> interpretedAST) {
         this.interpretedAST = interpretedAST;
     }
 

@@ -2,7 +2,7 @@ package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangeListener;
-import cambio.tltea.interpreter.nodes.StateChangedPublisher;
+import cambio.tltea.interpreter.nodes.TriggerNotifier;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -10,45 +10,45 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Lion Wagner
  */
-public class OrInteractionNode extends InteractionNode<Boolean> implements StateChangeListener<Boolean> {
-
+public class AndCauseNode extends CauseNode implements StateChangeListener<Boolean>  {
     private boolean state = false;
 
-    private final LinkedList<StateChangedPublisher<Boolean>> children = new LinkedList<>();
+    private final LinkedList<CauseNode> children = new LinkedList<>();
 
     private final AtomicInteger trueCount = new AtomicInteger(0);
 
-    public OrInteractionNode(InteractionNode<Boolean>... children) {
-        for (var child : children) {
+    public AndCauseNode( CauseNode... children) {
+        for (CauseNode child : children) {
             this.children.add(child);
             child.subscribe(this);
 
-            if (child.getValue()) {
+            if (child.getCurrentValue()) {
                 trueCount.incrementAndGet();
             }
         }
-        state = trueCount.get() > 0;
+        state = trueCount.get() == this.children.size();
     }
 
     @Override
     public void onEvent(StateChangeEvent<Boolean> event) {
-        if (event.getNewValue() != event.getOldValue()) {
+        if (event.getNewValue() != event.getOldValue()) { //stop bounce if there is no change
             if (event.getNewValue()) {
                 trueCount.incrementAndGet();
             } else {
                 trueCount.decrementAndGet();
             }
             boolean oldSate = state;
-            state = trueCount.get() > 0;
+            state = trueCount.get() == this.children.size();
 
             if (oldSate != state) {
-                notifySubscribers(new StateChangeEvent<>(this, true, false));
+                notifySubscribers(new StateChangeEvent<>(this, true, false, event.when()));
             }
         }
     }
 
     @Override
-    public Boolean getValue() {
+    public Boolean getCurrentValue() {
         return state;
     }
+
 }

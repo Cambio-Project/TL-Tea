@@ -85,6 +85,11 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     }
 
     @Override
+    public String toFormulaString() {
+        return operator.getShorthandImage();
+    }
+
+    @Override
     public ASTNode clone() {
         return new BinaryOperationASTNode(operator, left.clone(), right.clone());
     }
@@ -92,6 +97,11 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     @Override
     public int getSize() {
         return 1 + left.getSize() + right.getSize();
+    }
+
+    @Override
+    public int getTreeWidth() {
+        return left.getTreeWidth() + right.getTreeWidth();
     }
 
     @Override
@@ -114,10 +124,12 @@ public class BinaryOperationASTNode extends OperatorASTNode {
 
     public void setLeftChild(ASTNode left) {
         this.left = left;
+        left.setParent(this);
     }
 
     public void setRightChild(ASTNode right) {
         this.right = right;
+        right.setParent(this);
     }
 }
 

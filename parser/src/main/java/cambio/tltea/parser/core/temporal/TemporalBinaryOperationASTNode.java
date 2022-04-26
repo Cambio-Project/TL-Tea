@@ -6,7 +6,7 @@ import cambio.tltea.parser.core.BinaryOperationASTNode;
 /**
  * @author Lion Wagner
  */
-public final class TemporalBinaryOperationASTNode extends BinaryOperationASTNode implements ITemporalExpressionValueHolder {
+public final class TemporalBinaryOperationASTNode extends BinaryOperationASTNode implements ITemporalExpressionValueHolder, ITemporalOperationInfoHolder {
 
     private ITemporalValue temporalValueExpression;
 
@@ -20,15 +20,24 @@ public final class TemporalBinaryOperationASTNode extends BinaryOperationASTNode
         this.setTemporalExpressionValue(operatorInfo.temporalValueExpression());
     }
 
+    @Override
+    public TemporalOperatorInfo toTemporalOperatorInfo(){
+        return new TemporalOperatorInfo(this.getOperator(), this.getTemporalValue());
+    }
 
     @Override
-    public void setTemporalExpressionValue(String temporalValueExpression) {
-                this.temporalValueExpression = TemporalPropositionParser.parse(temporalValueExpression);
+    public void setTemporalExpressionValue(ITemporalValue temporalValueExpression) {
+        this.temporalValueExpression = temporalValueExpression;
     }
 
     @Override
     public ITemporalValue getTemporalValue() {
         return temporalValueExpression;
+    }
+
+    @Override
+    public String toFormulaString() {
+        return super.toFormulaString()  + this.getTemporalValue().toString();
     }
 
 }

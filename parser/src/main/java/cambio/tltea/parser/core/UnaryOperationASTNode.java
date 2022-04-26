@@ -10,7 +10,9 @@ public class UnaryOperationASTNode extends OperatorASTNode {
     private ASTNode child;
 
     public UnaryOperationASTNode(@NotNull OperatorToken operator, ASTNode child) {
-        this(operator.image(), child);
+        super(operator);
+        this.child = child;
+        child.setParent(this);
     }
 
     public UnaryOperationASTNode(String operator, ASTNode child) {
@@ -24,12 +26,18 @@ public class UnaryOperationASTNode extends OperatorASTNode {
         return getChildrenCount() + child.getSize();
     }
 
+    @Override
+    public int getTreeWidth() {
+        return child.getTreeWidth();
+    }
+
     public ASTNode getChild() {
         return child;
     }
 
     public void setChild(ASTNode child) {
         this.child = child;
+        child.setParent(this);
     }
 
     @Override
@@ -40,6 +48,11 @@ public class UnaryOperationASTNode extends OperatorASTNode {
     @Override
     public boolean isLeaf() {
         return false;
+    }
+
+    @Override
+    public String toFormulaString() {
+        return operator.getShorthandImage();
     }
 
     @Override

@@ -7,8 +7,12 @@ public abstract class OperatorASTNode extends ASTNode {
     protected final OperatorToken operator;
 
     public OperatorASTNode(String operatorImage) {
+        this(OperatorTokenImageMap.INSTANCE.getToken(operatorImage));
+    }
+
+    public OperatorASTNode(OperatorToken operator) {
         super();
-        this.operator = OperatorTokenImageMap.INSTANCE.getToken(operatorImage);
+        this.operator = operator;
     }
 
     public OperatorToken getOperator() {

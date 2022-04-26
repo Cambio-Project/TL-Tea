@@ -1,31 +1,59 @@
 package cambio.tltea.parser.core;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public enum OperatorToken {
-    TRUE("<TRUE>"),
-    FALSE("<FALSE>"),
-    NOT("<NOT>"),
-    AND("<AND>"),
-    OR("<OR>"),
-    IMPLIES("<IMPLIES>"),
-    IFF("<IFF>"),
-    EQ("<EQ>"),
-    NEQ("<NEQ>"),
-    LT("<LT>"),
-    LEQ("<LEQ>"),
-    GT("<GT>"),
-    GEQ("<GEQ>"),
-    NEXT("<NEXT_T>"),
-    GLOBALLY("<GLOBALLY_T>"),
-    FINALLY("<FINALLY_T>"),
-    UNTIL("<UNTIL_T>"),
-    RELEASE("<RELEASE_T>"),
-    WEAKUNTIL("<WEAKUNTIL_T>"),
-    UNKNOWN("<UNKNOWN>");
+    TRUE("<TRUE>","T"),
+    FALSE("<FALSE>","F"),
+    NOT("<NOT>", "¬"),
+    AND("<AND>", "∧"),
+    OR("<OR>", "∨"),
+    IMPLIES("<IMPLIES>", "->"),
+    IFF("<IFF>", "<->"),
+    EQ("<EQ>",  "=="),
+    NEQ("<NEQ>", "!="),
+    LT("<LT>", "<"),
+    LEQ("<LEQ>", "<="),
+    GT("<GT>",  ">"),
+    GEQ("<GEQ>", ">="),
+    NEXT("<NEXT_T>", "X"),
+    BEFORE("<BEFORE_T>","B"),
+    GLOBALLY("<GLOBALLY_T>","G"),
+    FINALLY("<FINALLY_T>","F"),
+    UNTIL("<UNTIL_T>", "U"),
+    RELEASE("<RELEASE_T>", "R"),
+    WEAKUNTIL("<WEAKUNTIL_T>", "W"),
+    SINCE("<SINCE_T>", "S"),
+    PAST("<PAST_T>", "P"),
+    PROPHECY("<PROPHECY_T>", "▷"),
+    HISTORY("<HISTORY_T>", "H"),
+    UNKNOWN("<UNKNOWN>", "<UNKNOWN>");
+
+    public static final Set<OperatorToken> TemporalOperatorTokens = EnumSet.of(OperatorToken.GLOBALLY,
+                                                                               OperatorToken.FINALLY,
+                                                                               OperatorToken.UNTIL,
+                                                                               OperatorToken.SINCE,
+                                                                               OperatorToken.RELEASE,
+                                                                               OperatorToken.WEAKUNTIL,
+                                                                               OperatorToken.BEFORE,
+                                                                               OperatorToken.NEXT,
+                                                                               OperatorToken.PAST,
+                                                                               OperatorToken.HISTORY,
+                                                                               OperatorToken.PROPHECY);
+    public static final Set<OperatorToken> ComparisonOperatorTokens = EnumSet.of(OperatorToken.EQ,
+                                                                                 OperatorToken.NEQ,
+                                                                                 OperatorToken.LT,
+                                                                                 OperatorToken.LEQ,
+                                                                                 OperatorToken.GT,
+                                                                                 OperatorToken.GEQ);
 
     private String image;
+    private String shorthandImage;
 
-    OperatorToken(String image) {
+    OperatorToken(String image, String shorthandString) {
         this.image = image;
+        this.shorthandImage = shorthandString;
     }
 
     public static OperatorToken fromString(String text) {
@@ -42,6 +70,7 @@ public enum OperatorToken {
 
     private OperatorToken setImage(String image) {
         this.image = image;
+        this.shorthandImage = image;
         return this;
     }
 
@@ -53,6 +82,14 @@ public enum OperatorToken {
         return image;
     }
 
+    public String getShorthandImage() {
+        return shorthandImage;
+    }
+
+    public String shorthandImage() {
+        return shorthandImage;
+    }
+
     public static OperatorToken UNKNOWN(String image) {
         return OperatorToken.UNKNOWN.setImage(image);
     }
@@ -61,4 +98,5 @@ public enum OperatorToken {
     public String toString() {
         return String.format("%s[%s]", this.name(), this.image);
     }
+
 }

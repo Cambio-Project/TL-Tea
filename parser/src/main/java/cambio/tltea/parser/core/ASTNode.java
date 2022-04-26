@@ -1,5 +1,7 @@
 package cambio.tltea.parser.core;
 
+import java.io.PrintStream;
+
 /**
  * @author Lion Wagner
  */
@@ -20,7 +22,25 @@ public abstract class ASTNode implements Cloneable {
         this.parent = parent;
     }
 
+    public final int depth() {
+        if (parent == null) {
+            return 0;
+        }
+        return 1 + parent.depth();
+    }
+
     public abstract int getSize();
+
+    public abstract int getTreeWidth();
+
+    public final void printTree() {
+        printTree(System.out);
+    }
+
+    public final void printTree(PrintStream out) {
+        ASTNodePrinter.INSTANCE.print(this, out);
+    }
+
 
     /**
      * Get children count.
@@ -45,6 +65,8 @@ public abstract class ASTNode implements Cloneable {
                "type=" + this.getClass().getSimpleName() +
                '}';
     }
+
+    public abstract String toFormulaString();
 
     public boolean isBracketed() {
         return isBracketed;

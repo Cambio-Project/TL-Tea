@@ -1,6 +1,8 @@
 package cambio.tltea.interpreter.utils;
 
 import cambio.tltea.parser.core.*;
+import cambio.tltea.parser.core.temporal.TemporalUnaryOperationASTNode;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -49,45 +51,145 @@ public final class ASTManipulator {
 
 
     /**
-     * Removes double negation from an AST.
-     * Accepts both parent and child negation nodes as input.
-     * E.g. morphs (a) && !!(b) into (a) && (b), if given the first or second NOT node as input.
-     *
+     * Removes double negation from an AST. Accepts both parent and child negation nodes as input. E.g. morphs (a) &&
+     * !!(b) into (a) && (b), if given the first or second NOT node as input.
+     * <p>
      * It is recommended to always use the parent as input to ensure a correct interpretation.
      *
-     * @param unNode Negation node that should be removed.
+     * @param doubleNotParent Negation node that should be removed.
      * @return The node that was double negated.
      */
-    public static @NotNull ASTNode removeDoubleNot(@NotNull UnaryOperationASTNode unNode) {
-        if (unNode.getOperator() != OperatorToken.NOT) {
+    public static @NotNull OperatorASTNode removeDoubleNot(@NotNull UnaryOperationASTNode doubleNotParent) {
+        if (doubleNotParent.getOperator() != OperatorToken.NOT) {
             throw new IllegalArgumentException("Expected a NOT node.");
         }
-        ASTNode targetChild = null;
-        ASTNode targetParent = null;
-        if (unNode.getParent() instanceof UnaryOperationASTNode unParent &&
-            unParent.getOperator() == OperatorToken.NOT) {
-            targetChild = unNode.getChild();
-            targetParent = unParent.getParent();
-        } else if (unNode.getChild() instanceof UnaryOperationASTNode unChild &&
-                   unChild.getOperator() == OperatorToken.NOT) {
-            targetChild = unChild.getChild();
-            targetParent = unNode.getParent();
+        if (doubleNotParent.getChild() instanceof UnaryOperationASTNode doubleNotChild && doubleNotChild.getOperator() == OperatorToken.NOT) {
+            redirectParent(doubleNotParent.getParent(),
+                           doubleNotParent,
+                           ((UnaryOperationASTNode) doubleNotParent.getChild()).getChild());
+            return doubleNotParent.getParent();
+        }
+        return doubleNotParent;
+    }
+
+    public static TemporalUnaryOperationASTNode insertImplicitGloballyRoot(ASTNode root) {
+        if (root instanceof TemporalUnaryOperationASTNode temporalNode) {
+            return temporalNode;
         }
 
-        if (targetChild == null) {
-            throw new IllegalStateException("Expected a double NOT node. Or remaining child was empty.");
+        var newNode = new TemporalUnaryOperationASTNode(OperatorToken.GLOBALLY, root);
+        insertBefore(root, newNode);
+        return newNode;
+    }
+
+    public static TemporalUnaryOperationASTNode insertImplicitFinallyRoot(ASTNode root) {
+        if (root instanceof TemporalUnaryOperationASTNode temporalNode) {
+            return temporalNode;
         }
 
-        if (targetParent instanceof BinaryOperationASTNode binParent) {
-            if (binParent.getLeftChild() == unNode) {
-                binParent.setLeftChild(targetChild);
-            } else {
-                binParent.setRightChild(targetChild);
+        var newNode = new TemporalUnaryOperationASTNode(OperatorToken.FINALLY, root);
+        insertBefore(root, newNode);
+        return newNode;
+    }
+
+
+    public static ASTNode applyNot(@NotNull UnaryOperationASTNode notNode) {
+        if (notNode.getOperator() != OperatorToken.NOT) {
+            throw new IllegalArgumentException("Expected a NOT node.");
+        }
+
+        if (notNode.getChild() instanceof BinaryOperationASTNode binaryNode) {
+            if (OperatorToken.ComparisonOperatorTokens.contains(binaryNode.getOperator())) {
+                return applyNotToComparison(binaryNode);
             }
-        } else if (targetParent instanceof UnaryOperationASTNode unParent) {
-            unParent.setChild(targetChild);
-        }
 
-        return targetChild;
+            return switch (binaryNode.getOperator()) {
+                case AND -> applyNotToAnd(binaryNode);
+                case OR -> applyNotToOr(binaryNode);
+                default -> throw new IllegalArgumentException("Operator not supported.");
+            };
+        }
+        else if(notNode.getChild() instanceof UnaryOperationASTNode unaryChild &&
+                unaryChild.getOperator() == OperatorToken.NOT) {
+                return removeDoubleNot(unaryChild);
+        }
+        throw new IllegalArgumentException("Cannot apply NOT (yet?) to " + notNode.getChild()
+                                                                                  .getClass()
+                                                                                  .getSimpleName() + " node.");
+    }
+
+    @Contract("_ -> new")
+    private static @NotNull OperatorASTNode applyNotToOr(@NotNull BinaryOperationASTNode binaryNode) {
+        return new BinaryOperationASTNode(OperatorToken.AND,
+                                          new UnaryOperationASTNode(OperatorToken.NOT, binaryNode.getLeftChild()),
+                                          new UnaryOperationASTNode(OperatorToken.NOT, binaryNode.getRightChild()));
+    }
+
+    @Contract("_ -> new")
+    private static @NotNull OperatorASTNode applyNotToAnd(@NotNull BinaryOperationASTNode binaryNode) {
+        return new BinaryOperationASTNode(OperatorToken.OR,
+                                          new UnaryOperationASTNode(OperatorToken.NOT, binaryNode.getLeftChild()),
+                                          new UnaryOperationASTNode(OperatorToken.NOT, binaryNode.getRightChild()));
+    }
+
+
+    /**
+     * Inserts the insertedNode before the currentNode.
+     *
+     * @param currentNode
+     * @param insertedNode
+     */
+    private static void insertBefore(ASTNode currentNode, UnaryOperationASTNode insertedNode) {
+        redirectParent(currentNode.getParent(), currentNode, insertedNode);
+    }
+
+    /**
+     * Replaces the given oldChild with the newChild. Does handle {@link UnaryOperationASTNode}s and {@link
+     * BinaryOperationASTNode}s.
+     *
+     * <b>This does not replace the relation that the oldChild potentially has to its children!</b>
+     *
+     * @param parent   The parent of the oldChild.
+     * @param oldChild The child that should be replaced.
+     * @param newChild The new child that should replace the oldChild.
+     */
+    public static void redirectParent(@NotNull OperatorASTNode parent,
+                                      @NotNull ASTNode oldChild,
+                                      @NotNull ASTNode newChild) {
+        if (parent instanceof UnaryOperationASTNode unParent) {
+            if (unParent.getChild() == oldChild) {
+                unParent.setChild(newChild);
+            } else {
+                throw new IllegalStateException("Expected oldChild to be a child of parent.");
+            }
+        } else if (parent instanceof BinaryOperationASTNode binParent) {
+            if (binParent.getLeftChild() == oldChild) {
+                binParent.setLeftChild(newChild);
+            } else if (binParent.getRightChild() == oldChild) {
+                binParent.setRightChild(newChild);
+            } else {
+                throw new IllegalStateException("Expected oldChild to be a child of parent.");
+            }
+        } else {
+            throw new IllegalStateException("Unexpected parent type: " + parent.getClass().getSimpleName());
+        }
+    }
+
+    private static BinaryOperationASTNode applyNotToComparison(@NotNull BinaryOperationASTNode comparisonNode) {
+        OperatorToken reversedOperator = switch (comparisonNode.getOperator()) {
+            case EQ -> OperatorToken.NEQ;
+            case NEQ -> OperatorToken.EQ;
+            case LT -> OperatorToken.GEQ;
+            case LEQ -> OperatorToken.GT;
+            case GT -> OperatorToken.LEQ;
+            case GEQ -> OperatorToken.LT;
+            default -> throw new IllegalStateException("Unexpected operator.");
+        };
+        UnaryOperationASTNode notParent = (UnaryOperationASTNode) comparisonNode.getParent();
+        BinaryOperationASTNode replacer = new BinaryOperationASTNode(reversedOperator,
+                                                                     comparisonNode.getLeftChild(),
+                                                                     comparisonNode.getRightChild());
+        redirectParent(notParent.getParent(), notParent, replacer);
+        return replacer;
     }
 }
