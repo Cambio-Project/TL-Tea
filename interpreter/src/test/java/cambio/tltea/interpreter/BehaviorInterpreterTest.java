@@ -1,6 +1,5 @@
 package cambio.tltea.interpreter;
 
-import cambio.tltea.interpreter.nodes.cause.EventActivationListener;
 import cambio.tltea.parser.core.ASTNode;
 import cambio.tltea.parser.core.temporal.TimeInstance;
 import cambio.tltea.parser.mtl.generated.MTLParser;
@@ -15,7 +14,7 @@ class BehaviorInterpreterTest {
         BehaviorInterpreter behaviorInterpreter = new BehaviorInterpreter();
         var result = behaviorInterpreter.interpret(ast);
 
-        result.getTriggerNotifier().subscribe((eventName, args) -> {
+        result.getTriggerNotifier().subscribeEventListener((eventName, args) -> {
             System.out.println(eventName);
         });
 

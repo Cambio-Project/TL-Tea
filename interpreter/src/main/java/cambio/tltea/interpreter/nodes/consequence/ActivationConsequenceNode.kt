@@ -1,10 +1,9 @@
 package cambio.tltea.interpreter.nodes.consequence
 
 import cambio.tltea.interpreter.nodes.TriggerNotifier
+import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 
-class ActivationConsequenceNode(triggerNotifier: TriggerNotifier) : ConsequenceNode(triggerNotifier) {
-    override fun activateConsequence() {
-        TODO("Not yet implemented")
-    }
-
-}
+abstract class ActivationConsequenceNode(
+    triggerNotifier: TriggerNotifier,
+    temporalContext: TemporalOperatorInfo
+) : ConsequenceNode(triggerNotifier, temporalContext)

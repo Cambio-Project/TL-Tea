@@ -20,8 +20,8 @@ class ComparisonActivationDescription(
     override val temporalContext: TemporalOperatorInfo,
     override val activationNode: ComparisonConsequenceNode,
     val operator: OperatorToken,
-    val left: ValueConsequenceNode<*>,
-    val right: ValueConsequenceNode<*>
+    val left: ValueEventConsequenceNode<*>,
+    val right: ValueEventConsequenceNode<*>
 ) : ActivationDescription(temporalContext, activationNode) {
 
 }

@@ -1,5 +1,6 @@
 package cambio.tltea.interpreter.nodes
 
+import cambio.tltea.interpreter.nodes.consequence.ValueEventActivationData
 import cambio.tltea.parser.mtl.generated.MTLParser
 import org.junit.jupiter.api.Test
 
@@ -14,7 +15,5 @@ internal class ConsequenceInterpreterTest {
         val interpretationResult = ConsequenceInterpreter().interpretAsMTL(ast)
 
         println(interpretationResult.consequenceAST)
-
-
     }
 }

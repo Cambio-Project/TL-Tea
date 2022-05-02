@@ -14,7 +14,11 @@ class ImplicationNode(
 ) : ConsequenceNode(triggerNotifier, temporalContext), StateChangeListener<Boolean> {
 
     override fun activateConsequence() {
-        triggerNotifier.activateListeners(causeDescription.getListeners())
+        //activate listeners to input of cause
+        causeDescription.activateListeners()
+
+        //activate self listening to changes
+        causeDescription.causeChangePublisher.subscribe(this)
     }
 
     override fun onEvent(event: StateChangeEvent<Boolean>) {
