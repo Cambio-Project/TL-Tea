@@ -39,22 +39,21 @@ class ComparisonCauseNodeTest {
                            ConstantValueProvider<?> equalValue,
                            ConstantValueProvider<?> otherValue) {
         ComparisonCauseNode identityNode = new ComparisonCauseNode(OperatorToken.EQ, null, value, value);
+        ComparisonCauseNode invertedIdentityNode = new ComparisonCauseNode(OperatorToken.NEQ, null, value, value);
         ComparisonCauseNode equalNode = new ComparisonCauseNode(OperatorToken.EQ, null, value, equalValue);
         ComparisonCauseNode neqNode = new ComparisonCauseNode(OperatorToken.NEQ, null, value, otherValue);
 
         Assertions.assertTrue(identityNode.getCurrentValue());
+        Assertions.assertFalse(invertedIdentityNode.getCurrentValue());
         Assertions.assertTrue(equalNode.getCurrentValue());
-        Assertions.assertFalse(neqNode.getCurrentValue());
+        Assertions.assertTrue(neqNode.getCurrentValue());
     }
 
-    private void testWithInversion(boolean expected, ValueProvider<?> value1, ValueProvider<?> value2, OperatorToken op) {
+    private void testWithInversion(boolean expected,
+                                   ValueProvider<?> value1,
+                                   ValueProvider<?> value2,
+                                   OperatorToken op) {
         ComparisonCauseNode node = new ComparisonCauseNode(op, null, value1, value2);
-        ComparisonCauseNode invertedOpAndValues = new ComparisonCauseNode(op.invert(), null, value2, value1);
-        ComparisonCauseNode invertedOP = new ComparisonCauseNode(op.invert(), null, value1, value2);
-
         Assertions.assertEquals(expected, node.getCurrentValue());
-        Assertions.assertEquals(expected, invertedOpAndValues.getCurrentValue());
-        Assertions.assertEquals(!expected, invertedOP.getCurrentValue());
-
     }
 }

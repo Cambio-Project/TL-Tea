@@ -9,6 +9,4 @@ public abstract class CauseNode extends StateChangedPublisher<Boolean> {
 
     public abstract Boolean getCurrentValue();
 
-    public CauseNode() {
-    }
 }
