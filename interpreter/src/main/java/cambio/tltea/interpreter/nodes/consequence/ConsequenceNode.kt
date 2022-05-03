@@ -13,4 +13,5 @@ abstract class ConsequenceNode(
     protected val temporalContext: TemporalOperatorInfo
 ) {
     abstract fun activateConsequence()
+    abstract fun deactivateConsequence()
 }

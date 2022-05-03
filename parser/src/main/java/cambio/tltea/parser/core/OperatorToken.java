@@ -4,23 +4,23 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public enum OperatorToken {
-    TRUE("<TRUE>","T"),
-    FALSE("<FALSE>","F"),
+    TRUE("<TRUE>", "T"),
+    FALSE("<FALSE>", "F"),
     NOT("<NOT>", "¬"),
     AND("<AND>", "∧"),
     OR("<OR>", "∨"),
     IMPLIES("<IMPLIES>", "->"),
     IFF("<IFF>", "<->"),
-    EQ("<EQ>",  "=="),
+    EQ("<EQ>", "=="),
     NEQ("<NEQ>", "!="),
     LT("<LT>", "<"),
     LEQ("<LEQ>", "<="),
-    GT("<GT>",  ">"),
+    GT("<GT>", ">"),
     GEQ("<GEQ>", ">="),
     NEXT("<NEXT_T>", "X"),
-    BEFORE("<BEFORE_T>","B"),
-    GLOBALLY("<GLOBALLY_T>","G"),
-    FINALLY("<FINALLY_T>","F"),
+    BEFORE("<BEFORE_T>", "B"),
+    GLOBALLY("<GLOBALLY_T>", "G"),
+    FINALLY("<FINALLY_T>", "F"),
     UNTIL("<UNTIL_T>", "U"),
     RELEASE("<RELEASE_T>", "R"),
     WEAKUNTIL("<WEAKUNTIL_T>", "W"),
@@ -99,4 +99,22 @@ public enum OperatorToken {
         return String.format("%s[%s]", this.name(), this.image);
     }
 
+    /**
+     * If the operator is a comparison operator, returns the corresponding inverted comparison operator token. E.g.
+     * {@link OperatorToken#EQ} -> {@link OperatorToken#NEQ} and {@link OperatorToken#LT} -> {@link OperatorToken#GEQ}.
+     *
+     * @return the inverted comparison operator token
+     * @throws IllegalArgumentException if the operator is not invertible operator
+     */
+    public OperatorToken invert() {
+        return switch (this) {
+            case EQ -> OperatorToken.NEQ;
+            case NEQ -> OperatorToken.EQ;
+            case LT -> OperatorToken.GEQ;
+            case LEQ -> OperatorToken.GT;
+            case GT -> OperatorToken.LEQ;
+            case GEQ -> OperatorToken.LT;
+            default -> throw new IllegalArgumentException("Cannot invert operator " + this);
+        };
+    }
 }

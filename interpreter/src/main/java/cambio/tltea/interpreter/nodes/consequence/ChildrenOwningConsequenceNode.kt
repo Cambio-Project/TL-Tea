@@ -6,5 +6,5 @@ import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 abstract class ChildrenOwningConsequenceNode(
     triggerNotifier: TriggerNotifier,
     temporalContext: TemporalOperatorInfo,
-    protected val children: List<ConsequenceNode>
+    protected val children: Collection<ConsequenceNode>
 ) : ConsequenceNode(triggerNotifier, temporalContext)

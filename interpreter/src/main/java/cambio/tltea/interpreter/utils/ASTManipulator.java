@@ -5,6 +5,10 @@ import cambio.tltea.parser.core.temporal.TemporalUnaryOperationASTNode;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+
 /**
  * @author Lion Wagner
  */
@@ -108,10 +112,9 @@ public final class ASTManipulator {
                 case OR -> applyNotToOr(binaryNode);
                 default -> throw new IllegalArgumentException("Operator not supported.");
             };
-        }
-        else if(notNode.getChild() instanceof UnaryOperationASTNode unaryChild &&
-                unaryChild.getOperator() == OperatorToken.NOT) {
-                return removeDoubleNot(unaryChild);
+        } else if (notNode.getChild() instanceof UnaryOperationASTNode unaryChild &&
+                   unaryChild.getOperator() == OperatorToken.NOT) {
+            return removeDoubleNot(unaryChild);
         }
         throw new IllegalArgumentException("Cannot apply NOT (yet?) to " + notNode.getChild()
                                                                                   .getClass()
@@ -176,20 +179,35 @@ public final class ASTManipulator {
     }
 
     private static BinaryOperationASTNode applyNotToComparison(@NotNull BinaryOperationASTNode comparisonNode) {
-        OperatorToken reversedOperator = switch (comparisonNode.getOperator()) {
-            case EQ -> OperatorToken.NEQ;
-            case NEQ -> OperatorToken.EQ;
-            case LT -> OperatorToken.GEQ;
-            case LEQ -> OperatorToken.GT;
-            case GT -> OperatorToken.LEQ;
-            case GEQ -> OperatorToken.LT;
-            default -> throw new IllegalStateException("Unexpected operator.");
-        };
+        OperatorToken reversedOperator = comparisonNode.getOperator().invert();
         UnaryOperationASTNode notParent = (UnaryOperationASTNode) comparisonNode.getParent();
         BinaryOperationASTNode replacer = new BinaryOperationASTNode(reversedOperator,
                                                                      comparisonNode.getLeftChild(),
                                                                      comparisonNode.getRightChild());
         redirectParent(notParent.getParent(), notParent, replacer);
         return replacer;
+    }
+
+    public static @NotNull Collection<ASTNode> flatten(@NotNull BinaryOperationASTNode node) {
+        OperatorToken op = node.getOperator();
+        if (op != OperatorToken.AND && op != OperatorToken.OR) {
+            throw new IllegalArgumentException("Expected AND or OR operator, but got " + op);
+        }
+
+        Collection<ASTNode> result = new HashSet<>();
+
+        ASTNode leftChild = node.getLeftChild();
+        ASTNode rightChild = node.getRightChild();
+
+        result.add(leftChild);
+        result.add(rightChild);
+        if (leftChild instanceof BinaryOperationASTNode binLeft && binLeft.getOperator() == op) {
+            result.addAll(flatten(binLeft));
+        }
+        if (rightChild instanceof BinaryOperationASTNode binRight && binRight.getOperator() == op) {
+            result.addAll(flatten(binRight));
+        }
+
+        return result;
     }
 }

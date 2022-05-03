@@ -1,5 +1,7 @@
 package cambio.tltea.parser.core;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author Lion Wagner
  */
@@ -50,5 +52,18 @@ public final class ValueASTNode extends ASTNode {
     @Override
     public ASTNode clone() {
         return new ValueASTNode(value);
+    }
+
+
+    public boolean containsEventName() {
+        return value.startsWith("(") && value.endsWith(")");
+    }
+
+    public @NotNull String getEventName() {
+        if (containsEventName()) {
+            return value.substring(1, value.length() - 1);
+        } else {
+            throw new IllegalStateException("Value does not contain event name");
+        }
     }
 }

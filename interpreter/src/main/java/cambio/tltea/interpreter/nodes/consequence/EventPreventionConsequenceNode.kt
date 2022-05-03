@@ -11,4 +11,8 @@ class EventPreventionConsequenceNode(
     override fun activateConsequence() {
         TODO("Not yet implemented")
     }
+
+    override fun deactivateConsequence() {
+        TODO("Not yet implemented")
+    }
 }

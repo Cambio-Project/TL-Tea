@@ -7,14 +7,17 @@ import cambio.tltea.interpreter.nodes.cause.EventActivationListener
 
 class CauseDescription(
     val causeASTRoot: CauseNode,
-    private val listeners: List<EventActivationListener>,
-    private val triggerNotifier: TriggerNotifier
+    private val listeners: List<EventActivationListener>
 ) {
 
     val causeChangePublisher: StateChangedPublisher<Boolean> = causeASTRoot
 
     fun activateListeners() {
-        triggerNotifier.activateListeners(listeners)
+        listeners.forEach { it.startListening() }
+    }
+
+    fun deactivateListeners() {
+        listeners.forEach { it.stopListening() }
     }
 
 }

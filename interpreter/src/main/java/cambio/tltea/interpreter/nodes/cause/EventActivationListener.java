@@ -1,17 +1,13 @@
 package cambio.tltea.interpreter.nodes.cause;
 
-import cambio.tltea.interpreter.nodes.StateChangeEvent;
-import cambio.tltea.interpreter.nodes.StateChangedPublisher;
 import cambio.tltea.parser.core.temporal.ITemporalValue;
 
 /**
  * @author Lion Wagner
  */
-public final class EventActivationListener extends StateChangedPublisher<Boolean> {
+public final class EventActivationListener extends ValueProvider<Boolean> {
 
     private final String eventName;
-
-    private boolean activated = false;
 
     public EventActivationListener(String eventName) {
         this.eventName = eventName;
@@ -22,7 +18,7 @@ public final class EventActivationListener extends StateChangedPublisher<Boolean
     }
 
     public boolean isActivated() {
-        return activated;
+        return currentValue;
     }
 
 
@@ -40,13 +36,5 @@ public final class EventActivationListener extends StateChangedPublisher<Boolean
 
     public void deactivate(ITemporalValue time) {
         notifyAndChangeState(false, time);
-    }
-
-    private void notifyAndChangeState(boolean activated, ITemporalValue time) {
-        subscribers.forEach(listener -> listener.onEvent(new StateChangeEvent<>(this,
-                                                                                activated,
-                                                                                this.activated,
-                                                                                time)));
-        this.activated = activated;
     }
 }

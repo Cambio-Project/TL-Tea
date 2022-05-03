@@ -21,10 +21,18 @@ class ImplicationNode(
         causeDescription.causeChangePublisher.subscribe(this)
     }
 
+    override fun deactivateConsequence() {
+        causeDescription.deactivateListeners()
+        causeDescription.causeChangePublisher.unsubscribe(this)
+    }
+
     override fun onEvent(event: StateChangeEvent<Boolean>) {
         //activate consequence if the new value carried by the event is "true"
         if (event.newValue) {
             consequence.activateConsequence()
+        }
+        else {
+            consequence.deactivateConsequence()
         }
     }
 

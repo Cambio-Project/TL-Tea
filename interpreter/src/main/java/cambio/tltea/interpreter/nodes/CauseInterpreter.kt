@@ -50,11 +50,11 @@ class CauseInterpreter {
 
     private fun interpretAsCauseEvent(valueNode: ValueASTNode): CauseNode {
         if (valueNode.value.startsWith("(") && valueNode.value.endsWith(")")) {
-            val eventActivationNode = EventActivationNode(valueNode.value)
-            listeners.add(eventActivationNode.eventListener)
+            val eventActivationListener = EventActivationListener(valueNode.value)
+            listeners.add(eventActivationListener)
 
             //wrap event activation in a ==True comparison
-            return ComparisonCauseNode(OperatorToken.EQ, null, eventActivationNode, ConstantValueProvider(true))
+            return ComparisonCauseNode(OperatorToken.EQ, null, eventActivationListener, ConstantValueProvider(true))
         } else if (valueNode.value.contains("$")) {
             TODO("A value watcher cannot be created yet.")
         }

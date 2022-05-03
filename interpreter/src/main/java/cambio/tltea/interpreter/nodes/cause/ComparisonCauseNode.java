@@ -2,9 +2,9 @@ package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangeListener;
-import cambio.tltea.interpreter.nodes.TriggerNotifier;
 import cambio.tltea.parser.core.OperatorToken;
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
+import kotlin.NotImplementedError;
 
 /**
  * @author Lion Wagner
@@ -30,8 +30,8 @@ public class ComparisonCauseNode extends CauseNode implements StateChangeListene
     //TODO: optimization we always take the same path through this method therefore we may be able to optimize
     @Override
     public Boolean getCurrentValue() {
-        var val1 = left.getCurrentValue();
-        var val2 = right.getCurrentValue();
+        var val1 = left.currentValue;
+        var val2 = right.currentValue;
 
         if (val1 == null || val2 == null) {
             return false;
@@ -40,7 +40,7 @@ public class ComparisonCauseNode extends CauseNode implements StateChangeListene
             return switch (operator) {
                 case EQ -> val1.equals(val2);
                 case NEQ -> !val1.equals(val2);
-                default -> throw new IllegalArgumentException("Operator not supported for string comparison:" + operator);
+                default -> throw new IllegalStateException("Operator not supported for string comparison:" + operator);
             };
         } else if (val1 instanceof Number n1 && val2 instanceof Number n2) {
             return switch (operator) {
@@ -50,7 +50,7 @@ public class ComparisonCauseNode extends CauseNode implements StateChangeListene
                 case GEQ -> n1.doubleValue() >= n2.doubleValue();
                 case LT -> n1.doubleValue() < n2.doubleValue();
                 case LEQ -> n1.doubleValue() <= n2.doubleValue();
-                default -> throw new IllegalArgumentException("Operator not supported as comparison: " + operator);
+                default -> throw new IllegalStateException("Operator not supported as comparison: " + operator);
             };
         } else if (val1 instanceof Comparable || val2 instanceof Comparable) {
             try {
@@ -68,18 +68,22 @@ public class ComparisonCauseNode extends CauseNode implements StateChangeListene
                     case GEQ -> compareValue >= 0;
                     case LT -> compareValue < 0;
                     case LEQ -> compareValue <= 0;
-                    default -> throw new IllegalArgumentException("Operator not supported as comparison: " + operator);
+                    default -> throw new IllegalStateException("Operator not supported as comparison: " + operator);
                 };
             } catch (ClassCastException ignored) {
             }
         }
 
-        throw new IllegalArgumentException("Value type could not be compared: " + val1.getClass() + " and " + val2.getClass());
+        throw new IllegalStateException("Value type could not be compared: " + val1.getClass() + " and " + val2.getClass());
     }
 
 
+    public OperatorToken getOperator() {
+        return operator;
+    }
+
     @Override
     public void onEvent(StateChangeEvent<Object> event) {
-
+        throw new NotImplementedError();
     }
 }
