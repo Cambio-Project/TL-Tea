@@ -2,10 +2,6 @@ package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangeListener;
-import cambio.tltea.interpreter.nodes.StateChangedPublisher;
-import cambio.tltea.interpreter.nodes.TriggerNotifier;
-import cambio.tltea.parser.core.temporal.ITemporalValue;
-import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;

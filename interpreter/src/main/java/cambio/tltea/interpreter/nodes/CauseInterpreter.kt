@@ -49,8 +49,8 @@ class CauseInterpreter {
     }
 
     private fun interpretAsCauseEvent(valueNode: ValueASTNode): CauseNode {
-        if (valueNode.value.startsWith("(") && valueNode.value.endsWith(")")) {
-            val eventActivationListener = EventActivationListener(valueNode.value)
+        if (valueNode.containsEventName()) {
+            val eventActivationListener = EventActivationListener(valueNode.eventName)
             listeners.add(eventActivationListener)
 
             //wrap event activation in a ==True comparison

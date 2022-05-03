@@ -2,7 +2,6 @@ package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangeListener;
-import cambio.tltea.interpreter.nodes.TriggerNotifier;
 
 /**
  * @author Lion Wagner

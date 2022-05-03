@@ -13,7 +13,7 @@ public final class TemporalOperatorInfo implements IOperatorInfo {
 
 
     public TemporalOperatorInfo(OperatorToken operator, ITemporalValue temporalValueExpression) {
-        if (OperatorToken.TemporalOperatorTokens.contains(operator)) {
+        if (!OperatorToken.TemporalOperatorTokens.contains(operator)) {
             throw new IllegalArgumentException("Operator " + operator + " is not allowed");
         }
         this.operator = operator;

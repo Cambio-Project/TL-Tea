@@ -3,7 +3,7 @@ package cambio.tltea.parser.core
 import java.io.PrintStream
 import kotlin.math.min
 
-internal object ASTNodePrinter {
+object ASTNodePrinter {
 
     private const val DEFAULT_CONSOLE_COLUMN_COUNT = 80
 

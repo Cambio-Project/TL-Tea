@@ -8,6 +8,6 @@ import cambio.tltea.parser.core.temporal.ITemporalValue;
 public class ValueListener<T> extends ValueProvider<T> {
 
     public void updateValue(T value, ITemporalValue time) {
-        super.notifyAndChangeState(value, time);
+        super.changeStateAndNotify(value, time);
     }
 }

@@ -8,15 +8,15 @@ public abstract class ValueProvider<T> extends StateChangedPublisher<T> {
     private boolean isListening;
     protected T currentValue;
 
-    protected void notifyAndChangeState(T newValue, ITemporalValue time) {
+    protected void changeStateAndNotify(T newValue, ITemporalValue time) {
         if (!isListening) {
             return;
         }
+        this.currentValue = newValue;
         subscribers.forEach(listener -> listener.onEvent(new StateChangeEvent<>(this,
                                                                                 newValue,
                                                                                 currentValue,
                                                                                 time)));
-        this.currentValue = newValue;
     }
 
 

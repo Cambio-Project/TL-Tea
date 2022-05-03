@@ -12,9 +12,11 @@ class EventActivationData(eventName: String, temporalContext: TemporalOperatorIn
     ActivationData<String>(eventName, temporalContext)
 
 class ValueEventActivationData<T : Any>(
+    val targetProperty: String,
     data: T,
-    temporalContext: TemporalOperatorInfo,
-    operator: OperatorToken
+    val operator: OperatorToken,
+    val active: Boolean,
+    temporalContext: TemporalOperatorInfo
 ) : ActivationData<T>(
     data,
     temporalContext

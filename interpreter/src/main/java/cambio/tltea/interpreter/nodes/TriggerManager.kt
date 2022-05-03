@@ -1,12 +1,15 @@
 package cambio.tltea.interpreter.nodes
 
+import cambio.tltea.interpreter.nodes.cause.EventActivationListener
 import cambio.tltea.interpreter.nodes.consequence.ActivationData
 import java.util.function.Consumer
 
 /**
  * @author Lion Wagner
  */
-class TriggerNotifier : ISubscribableTriggerNotifier {
+class TriggerManager : ISubscribableTriggerNotifier {
+
+    internal val eventActivationListeners: MutableCollection<EventActivationListener> = HashSet()
 
     private val anySubscribers: MutableCollection<Consumer<ActivationData<*>>> = HashSet()
 
@@ -17,7 +20,10 @@ class TriggerNotifier : ISubscribableTriggerNotifier {
         anySubscribers.add(listener)
     }
 
-    override fun subscribeEventListenerWithFilter(listener: Consumer<ActivationData<*>>, filter: Class<ActivationData<*>>) {
+    override fun subscribeEventListenerWithFilter(
+        listener: Consumer<ActivationData<*>>,
+        filter: Class<ActivationData<*>>
+    ) {
         if (!filteredSubscribers.containsKey(filter)) {
             filteredSubscribers[filter] = HashSet()
         }
@@ -33,4 +39,5 @@ class TriggerNotifier : ISubscribableTriggerNotifier {
         anySubscribers.forEach { it.accept(activationData) }
         filteredSubscribers[activationData.javaClass]?.forEach { it.accept(activationData) }
     }
+
 }

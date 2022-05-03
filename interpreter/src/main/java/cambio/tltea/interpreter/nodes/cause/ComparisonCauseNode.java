@@ -1,18 +1,18 @@
 package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
-import cambio.tltea.interpreter.nodes.StateChangeListener;
 import cambio.tltea.parser.core.OperatorToken;
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
-import kotlin.NotImplementedError;
 
 /**
  * @author Lion Wagner
  */
-public class ComparisonCauseNode extends CauseNode implements StateChangeListener<Object> {
+public class ComparisonCauseNode extends CauseNode {
     private final OperatorToken operator;
     private final ValueProvider<?> left;
     private final ValueProvider<?> right;
+
+    private boolean lastValue = false;
 
     public ComparisonCauseNode(OperatorToken operator,
                                TemporalOperatorInfo temporalContext,
@@ -24,12 +24,25 @@ public class ComparisonCauseNode extends CauseNode implements StateChangeListene
         this.operator = operator;
         this.left = left;
         this.right = right;
+
+        this.left.subscribe(event -> {
+            var lastValue = this.lastValue;
+            super.notifySubscribers(new StateChangeEvent<>(this, getCurrentValue(), lastValue, event.when()));
+        });
+        this.right.subscribe(event -> {
+            var lastValue = this.lastValue;
+            super.notifySubscribers(new StateChangeEvent<>(this, getCurrentValue(), lastValue, event.when()));
+        });
     }
 
 
     //TODO: optimization we always take the same path through this method therefore we may be able to optimize
     @Override
     public Boolean getCurrentValue() {
+        return lastValue = compareSides();
+    }
+
+    private boolean compareSides() {
         var val1 = left.currentValue;
         var val2 = right.currentValue;
 
@@ -82,8 +95,4 @@ public class ComparisonCauseNode extends CauseNode implements StateChangeListene
         return operator;
     }
 
-    @Override
-    public void onEvent(StateChangeEvent<Object> event) {
-        throw new NotImplementedError();
-    }
 }

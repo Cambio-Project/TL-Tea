@@ -114,7 +114,7 @@ public final class ASTManipulator {
             };
         } else if (notNode.getChild() instanceof UnaryOperationASTNode unaryChild &&
                    unaryChild.getOperator() == OperatorToken.NOT) {
-            return removeDoubleNot(unaryChild);
+            return removeDoubleNot(notNode);
         }
         throw new IllegalArgumentException("Cannot apply NOT (yet?) to " + notNode.getChild()
                                                                                   .getClass()

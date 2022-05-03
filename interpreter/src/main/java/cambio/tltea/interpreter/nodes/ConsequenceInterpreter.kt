@@ -6,7 +6,6 @@ import cambio.tltea.parser.core.*
 import cambio.tltea.parser.core.temporal.*
 
 
-
 /**
  * Expects a future MTL formula.
  * <p>
@@ -36,17 +35,17 @@ class ConsequenceInterpreter {
 
     /**
      * @param mtlRoot the root of the parsed MTL formula
-     * @param triggerNotifier this parameter can be used to combine multiple {@link TriggerNotifier}s from previous interpretations
+     * @param triggerManager this parameter can be used to combine multiple {@link TriggerNotifier}s from previous interpretations
      */
     @JvmOverloads
-    fun interpretAsMTL(mtlRoot: ASTNode, triggerNotifier: TriggerNotifier = TriggerNotifier()): ConsequenceDescription {
+    fun interpretAsMTL(mtlRoot: ASTNode, triggerManager: TriggerManager = TriggerManager()): ConsequenceDescription {
 
-        val consequenceDescription = ConsequenceDescription(triggerNotifier)
+        val consequenceDescription = ConsequenceDescription(triggerManager)
         //gather initial temporal info
         val temporalContext = if (mtlRoot is ITemporalOperationInfoHolder) mtlRoot.toTemporalOperatorInfo()
         else TemporalOperatorInfo(OperatorToken.GLOBALLY, TemporalInterval(0.0, Double.POSITIVE_INFINITY))
 
-        val consequenceAST = interpret(mtlRoot, triggerNotifier, temporalContext, consequenceDescription)
+        val consequenceAST = interpret(mtlRoot, temporalContext, consequenceDescription)
         consequenceDescription.consequenceAST = consequenceAST
         return consequenceDescription
     }
@@ -57,36 +56,31 @@ class ConsequenceInterpreter {
      */
     private fun interpret(
         node: ASTNode,
-        triggerNotifier: TriggerNotifier,
         temporalContext: TemporalOperatorInfo,
         consequenceDescription: ConsequenceDescription
     ): ConsequenceNode {
         return when (node) {
             is TemporalBinaryOperationASTNode -> interpretTemporalBinaryOperation(
                 node,
-                triggerNotifier,
                 temporalContext,
                 consequenceDescription
             )
             is TemporalUnaryOperationASTNode -> interpretTemporalUnaryOperation(
                 node,
-                triggerNotifier,
                 temporalContext,
                 consequenceDescription
             )
             is BinaryOperationASTNode -> interpretBinaryOperation(
                 node,
-                triggerNotifier,
                 temporalContext,
                 consequenceDescription
             )
             is UnaryOperationASTNode -> interpretUnaryOperation(
                 node,
-                triggerNotifier,
                 temporalContext,
                 consequenceDescription
             )
-            is ValueASTNode -> interpretValueNode(node, triggerNotifier, temporalContext, consequenceDescription)
+            is ValueASTNode -> interpretValueNode(node, temporalContext, consequenceDescription)
             else -> {
                 throw IllegalArgumentException("Cannot interpret node of type ${node.javaClass.simpleName}")
             }
@@ -97,7 +91,6 @@ class ConsequenceInterpreter {
 
     private fun interpretTemporalBinaryOperation(
         node: TemporalBinaryOperationASTNode,
-        triggerNotifier: TriggerNotifier,
         temporalContext: TemporalOperatorInfo,
         consequenceDescription: ConsequenceDescription
     ): ConsequenceNode {
@@ -116,7 +109,6 @@ class ConsequenceInterpreter {
 
     private fun interpretTemporalUnaryOperation(
         node: TemporalUnaryOperationASTNode,
-        triggerNotifier: TriggerNotifier,
         temporalContext: TemporalOperatorInfo,
         consequenceDescription: ConsequenceDescription
     ): ConsequenceNode {
@@ -126,21 +118,20 @@ class ConsequenceInterpreter {
         //TODO: for now the temporal context is simply passed down. In the future multiple temporal contexts may need to interact.
         //Prophecy, Globally, Finally, Next
         val temporalContext = node.toTemporalOperatorInfo()
-        return interpret(node.child, triggerNotifier, temporalContext, consequenceDescription)
+        return interpret(node.child, temporalContext, consequenceDescription)
     }
 
 
     private fun interpretBinaryOperation(
         node: BinaryOperationASTNode,
-        triggerNotifier: TriggerNotifier,
         temporalContext: TemporalOperatorInfo,
         consequenceDescription: ConsequenceDescription
     ): ConsequenceNode {
 
         if (node is TemporalBinaryOperationASTNode) {
-            return interpretTemporalBinaryOperation(node, triggerNotifier, temporalContext, consequenceDescription)
+            return interpretTemporalBinaryOperation(node, temporalContext, consequenceDescription)
         } else if (OperatorToken.ComparisonOperatorTokens.contains(node.operator)) {
-            //create consequnce comparison node
+            //create consequence comparison node
             val leftChild = node.leftChild as ValueASTNode
             val rightChild = node.rightChild as ValueASTNode
 
@@ -154,37 +145,49 @@ class ConsequenceInterpreter {
                 throw IllegalArgumentException("Cannot interpret value event. Neither left nor right child is a target property or event.")
             }
 
+            val targetValue = try {
+                targetValueHolder.value.toDouble()
+            } catch (e: NumberFormatException) {
+                targetValueHolder.value
+            }
+
             return ValueEventConsequenceNode(
-                triggerNotifier,
                 targetEventHolder.eventName,
-                targetValueHolder.value,
+                targetValue,
+                node.operator,
+                consequenceDescription.triggerManager,
                 temporalContext
             )
 
         } else {
             val interpretShorthand =
-                { child: ASTNode -> interpret(child, triggerNotifier, temporalContext, consequenceDescription) }
+                { child: ASTNode -> interpret(child, temporalContext, consequenceDescription) }
             when (node.operator) {
                 OperatorToken.IMPLIES -> {
                     //create implication node
-                    return interpretImplication(node, triggerNotifier, temporalContext)
+                    return interpretImplication(node, temporalContext, consequenceDescription)
                 }
                 OperatorToken.AND -> {
                     //create consequence "and" node
                     val children = ASTManipulator.flatten(node)
-                    return AndConsequenceNode(triggerNotifier, temporalContext, children.map { interpretShorthand(it) })
+                    return AndConsequenceNode(
+                        consequenceDescription.triggerManager,
+                        temporalContext,
+                        children.map { interpretShorthand(it) })
                 }
                 OperatorToken.OR -> {
                     //create consequence "or" node
                     val children = ASTManipulator.flatten(node)
-                    return OrConsequenceNode(triggerNotifier, temporalContext, children.map { interpretShorthand(it) })
+                    return OrConsequenceNode(
+                        consequenceDescription.triggerManager,
+                        temporalContext,
+                        children.map { interpretShorthand(it) })
                 }
                 OperatorToken.IFF -> {
                     //split <-> into <- and ->
                     //this only works in rare cases
                     return interpretBinaryOperation(
                         ASTManipulator.splitIFF(node),
-                        triggerNotifier,
                         temporalContext,
                         consequenceDescription
                     )
@@ -199,7 +202,6 @@ class ConsequenceInterpreter {
 
     private fun interpretUnaryOperation(
         node: UnaryOperationASTNode,
-        triggerNotifier: TriggerNotifier,
         temporalContext: TemporalOperatorInfo,
         consequenceDescription: ConsequenceDescription
     ): ConsequenceNode {
@@ -207,18 +209,16 @@ class ConsequenceInterpreter {
             val child = node.child
             if (child is ValueASTNode) {
                 val value = if (child.containsEventName()) child.eventName else child.value
-                return EventPreventionConsequenceNode(triggerNotifier, temporalContext, value)
+                return EventPreventionConsequenceNode(consequenceDescription.triggerManager, temporalContext, value)
             } else if (child is UnaryOperationASTNode && child.operator == OperatorToken.NOT) {
                 return interpret(
                     ASTManipulator.removeDoubleNot(node),
-                    triggerNotifier,
                     temporalContext,
                     consequenceDescription
                 )
             } else {
                 return interpret(
                     ASTManipulator.applyNot(node),
-                    triggerNotifier,
                     temporalContext,
                     consequenceDescription
                 )
@@ -231,12 +231,15 @@ class ConsequenceInterpreter {
 
     private fun interpretValueNode(
         node: ValueASTNode,
-        triggerNotifier: TriggerNotifier,
         temporalContext: TemporalOperatorInfo,
         consequenceDescription: ConsequenceDescription
     ): ActivationConsequenceNode {
         if (node.containsEventName()) {
-            return EventActivationConsequenceNode(triggerNotifier, temporalContext, node.eventName)
+            return EventActivationConsequenceNode(
+                consequenceDescription.triggerManager,
+                temporalContext,
+                node.eventName
+            )
         } else {
             throw IllegalArgumentException("Cannot interpret node of type ${node.javaClass.simpleName}")
         }
@@ -244,8 +247,8 @@ class ConsequenceInterpreter {
 
     private fun interpretImplication(
         root: BinaryOperationASTNode,
-        triggerNotifier: TriggerNotifier,
-        temporalContext: TemporalOperatorInfo
+        temporalContext: TemporalOperatorInfo,
+        consequenceDescription: ConsequenceDescription
     ): ConsequenceNode {
         if (root.operator != OperatorToken.IMPLIES) {
             throw IllegalArgumentException("Expected operator ${OperatorToken.IMPLIES}, but found ${root.operator}")
@@ -255,13 +258,16 @@ class ConsequenceInterpreter {
         val right = root.rightChild
 
         val cause = CauseInterpreter().interpretLTL(left)
-        val consequence = ConsequenceInterpreter().interpretAsMTL(right, triggerNotifier)
+        val consequence = ConsequenceInterpreter().interpretAsMTL(right, consequenceDescription.triggerManager)
+
+        consequenceDescription.triggerManager.eventActivationListeners.addAll(cause.listeners)
+
 
         return ImplicationNode(
             cause,
             consequence,
             temporalContext,
-            triggerNotifier
+            consequenceDescription.triggerManager,
         )
     }
 }

@@ -10,8 +10,8 @@ class ImplicationNode(
     private val causeDescription: CauseDescription,
     private val consequence: ConsequenceDescription,
     temporalContext: TemporalOperatorInfo,
-    triggerNotifier: TriggerNotifier
-) : ConsequenceNode(triggerNotifier, temporalContext), StateChangeListener<Boolean> {
+    triggerManager: TriggerManager
+) : ConsequenceNode(triggerManager, temporalContext), StateChangeListener<Boolean> {
 
     override fun activateConsequence() {
         //activate listeners to input of cause

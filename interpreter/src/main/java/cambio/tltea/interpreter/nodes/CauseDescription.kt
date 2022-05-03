@@ -7,7 +7,7 @@ import cambio.tltea.interpreter.nodes.cause.EventActivationListener
 
 class CauseDescription(
     val causeASTRoot: CauseNode,
-    private val listeners: List<EventActivationListener>
+    val listeners: List<EventActivationListener>
 ) {
 
     val causeChangePublisher: StateChangedPublisher<Boolean> = causeASTRoot

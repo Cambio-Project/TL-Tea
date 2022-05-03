@@ -1,13 +1,13 @@
 package cambio.tltea.interpreter.nodes.consequence
 
-import cambio.tltea.interpreter.nodes.TriggerNotifier
+import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 
 class OrConsequenceNode(
-    triggerNotifier: TriggerNotifier,
+    triggerManager: TriggerManager,
     temporalContext: TemporalOperatorInfo,
     children: List<ConsequenceNode>
-) : ChildrenOwningConsequenceNode(triggerNotifier, temporalContext, children) {
+) : ChildrenOwningConsequenceNode(triggerManager, temporalContext, children) {
     override fun activateConsequence() {
         TODO("Not yet implemented")
     }

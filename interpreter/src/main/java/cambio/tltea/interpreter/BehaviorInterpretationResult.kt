@@ -2,6 +2,7 @@ package cambio.tltea.interpreter
 
 import cambio.tltea.interpreter.nodes.ConsequenceDescription
 import cambio.tltea.interpreter.nodes.ISubscribableTriggerNotifier
+import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.interpreter.nodes.consequence.ActivationData
 import cambio.tltea.parser.core.ASTNode
 import java.util.function.Consumer
@@ -9,24 +10,33 @@ import java.util.function.Consumer
 /**
  * @author Lion Wagner
  */
-class BehaviorInterpretationResult internal constructor(val modifiedAST: ASTNode, val consequenceDescription: ConsequenceDescription) :
+class BehaviorInterpretationResult internal constructor(
+    val modifiedAST: ASTNode,
+    val consequenceDescription: ConsequenceDescription,
+    val triggerManager: TriggerManager = consequenceDescription.triggerManager
+) :
     ISubscribableTriggerNotifier {
 
 
+
+    fun activateProcessing() {
+      consequenceDescription.activateConsequence()
+    }
+
     // ----- delegating the subscriptions to the trigger manager-----
     override fun subscribeEventListener(listener: Consumer<ActivationData<*>>) {
-        consequenceDescription.triggerNotifier.subscribeEventListener(listener)
+        consequenceDescription.triggerManager.subscribeEventListener(listener)
     }
 
     override fun subscribeEventListenerWithFilter(
         listener: Consumer<ActivationData<*>>,
         filter: Class<ActivationData<*>>
     ) {
-        consequenceDescription.triggerNotifier.subscribeEventListenerWithFilter(listener, filter)
+        consequenceDescription.triggerManager.subscribeEventListenerWithFilter(listener, filter)
     }
 
     override fun unsubscribe(listener: Consumer<ActivationData<*>>) {
-        consequenceDescription.triggerNotifier.unsubscribe(listener)
+        consequenceDescription.triggerManager.unsubscribe(listener)
     }
     //---------------------------------------------------------------
 

@@ -27,7 +27,7 @@ public final class EventActivationListener extends ValueProvider<Boolean> {
     }
 
     public void activate(ITemporalValue time) {
-        notifyAndChangeState(true, time);
+        changeStateAndNotify(true, time);
     }
 
     public void reset(ITemporalValue time) {
@@ -35,6 +35,6 @@ public final class EventActivationListener extends ValueProvider<Boolean> {
     }
 
     public void deactivate(ITemporalValue time) {
-        notifyAndChangeState(false, time);
+        changeStateAndNotify(false, time);
     }
 }
