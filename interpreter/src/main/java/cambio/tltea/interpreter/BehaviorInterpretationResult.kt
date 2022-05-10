@@ -18,9 +18,8 @@ class BehaviorInterpretationResult internal constructor(
     ISubscribableTriggerNotifier {
 
 
-
     fun activateProcessing() {
-      consequenceDescription.activateConsequence()
+        consequenceDescription.activateConsequence()
     }
 
     // ----- delegating the subscriptions to the trigger manager-----
@@ -28,9 +27,9 @@ class BehaviorInterpretationResult internal constructor(
         consequenceDescription.triggerManager.subscribeEventListener(listener)
     }
 
-    override fun subscribeEventListenerWithFilter(
-        listener: Consumer<ActivationData<*>>,
-        filter: Class<ActivationData<*>>
+    override fun <T : ActivationData<*>> subscribeEventListenerWithFilter(
+        listener: Consumer<T>,
+        filter: Class<T>
     ) {
         consequenceDescription.triggerManager.subscribeEventListenerWithFilter(listener, filter)
     }

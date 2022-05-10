@@ -13,21 +13,21 @@ class TriggerManager : ISubscribableTriggerNotifier {
 
     private val anySubscribers: MutableCollection<Consumer<ActivationData<*>>> = HashSet()
 
-    private val filteredSubscribers: HashMap<Class<ActivationData<*>>, MutableSet<Consumer<ActivationData<*>>>> =
+    private val filteredSubscribers: HashMap<Class<*>, MutableSet<Consumer<ActivationData<*>>>> =
         HashMap()
 
     override fun subscribeEventListener(listener: Consumer<ActivationData<*>>) {
         anySubscribers.add(listener)
     }
 
-    override fun subscribeEventListenerWithFilter(
-        listener: Consumer<ActivationData<*>>,
-        filter: Class<ActivationData<*>>
+    override fun <T : ActivationData<*>> subscribeEventListenerWithFilter(
+        listener: Consumer<T>,
+        filter: Class<T>
     ) {
         if (!filteredSubscribers.containsKey(filter)) {
             filteredSubscribers[filter] = HashSet()
         }
-        filteredSubscribers[filter]!!.add(listener)
+        filteredSubscribers[filter]!!.add(listener as Consumer<ActivationData<*>>)
     }
 
     override fun unsubscribe(listener: Consumer<ActivationData<*>>) {

@@ -225,7 +225,7 @@ class ConsequenceInterpreter {
             }
 
         } else {
-            throw IllegalArgumentException("Cannot  interpret node of type ${node.javaClass.simpleName}")
+            throw IllegalArgumentException("Cannot interpret node of type ${node.javaClass.simpleName}")
         }
     }
 

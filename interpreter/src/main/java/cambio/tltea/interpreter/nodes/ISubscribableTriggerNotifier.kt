@@ -5,6 +5,10 @@ import java.util.function.Consumer
 
 interface ISubscribableTriggerNotifier {
     fun subscribeEventListener(listener: Consumer<ActivationData<*>>)
-    fun subscribeEventListenerWithFilter(listener: Consumer<ActivationData<*>>, filter: Class<ActivationData<*>>)
+    fun <T : ActivationData<*>> subscribeEventListenerWithFilter(
+        listener: Consumer<T>,
+        filter: Class<T>
+    )
+
     fun unsubscribe(listener: Consumer<ActivationData<*>>)
 }
