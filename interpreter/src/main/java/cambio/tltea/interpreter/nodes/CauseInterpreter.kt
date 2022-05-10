@@ -25,7 +25,7 @@ class CauseInterpreter {
                 return interpretAsCause(root.child, root.toTemporalOperatorInfo())
             }
             is ValueASTNode -> {
-                interpretAsCauseEvent(root)
+                interpretAsCauseEvent(root, temporalContext)
             }
             is UnaryOperationASTNode -> {
                 interpretAsCause(root, temporalContext)
@@ -47,7 +47,7 @@ class CauseInterpreter {
             OperatorToken.NOT -> {
                 if (unNode.child is ValueASTNode) {
                     @Suppress("UNCHECKED_CAST")
-                    return NotCauseNode(interpretAsCauseEvent(unNode.child as ValueASTNode), temporalContext)
+                    return NotCauseNode(interpretAsCauseEvent(unNode.child as ValueASTNode, temporalContext), temporalContext)
                 } else return (interpretAsCause(ASTManipulator.applyNot(unNode), temporalContext))
             }
             else -> {
@@ -56,13 +56,13 @@ class CauseInterpreter {
         }
     }
 
-    private fun interpretAsCauseEvent(valueNode: ValueASTNode): CauseNode {
+    private fun interpretAsCauseEvent(valueNode: ValueASTNode, temporalContext: TemporalOperatorInfo): CauseNode {
         if (valueNode.containsEventName()) {
             val eventActivationListener = EventActivationListener(valueNode.eventName)
             listeners.add(eventActivationListener)
 
             //wrap event activation in a ==True comparison
-            return ComparisonCauseNode(OperatorToken.EQ, null, eventActivationListener, ConstantValueProvider(true))
+            return ComparisonCauseNode(OperatorToken.EQ, temporalContext, eventActivationListener, ConstantValueProvider(true))
         } else if (valueNode.value.contains("$")) {
             TODO("A value watcher cannot be created yet.")
         }
