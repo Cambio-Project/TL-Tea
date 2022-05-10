@@ -18,6 +18,7 @@ public class ComparisonCauseNode extends CauseNode {
                                TemporalOperatorInfo temporalContext,
                                ValueProvider<?> left,
                                ValueProvider<?> right) {
+        super(temporalContext);
         if (!OperatorToken.ComparisonOperatorTokens.contains(operator)) {
             throw new IllegalArgumentException("Operator not supported as comparison: " + operator);
         }
@@ -36,7 +37,7 @@ public class ComparisonCauseNode extends CauseNode {
     }
 
 
-    //TODO: optimization we always take the same path through this method therefore we may be able to optimize
+    //TODO: optimization: we always take the same path through this method therefore we may be able to optimize
     @Override
     public Boolean getCurrentValue() {
         return lastValue = compareSides();
@@ -48,6 +49,9 @@ public class ComparisonCauseNode extends CauseNode {
 
         if (val1 == null || val2 == null) {
             return false;
+        }
+        if (val1 == val2) {
+            return operator == OperatorToken.EQ;
         }
         if (val1 instanceof String && val2 instanceof String) {
             return switch (operator) {
@@ -69,11 +73,17 @@ public class ComparisonCauseNode extends CauseNode {
             try {
                 int compareValue = 0;
                 if (val1 instanceof Comparable c1) {
-                    compareValue = c1.compareTo(val2);
-                } else //noinspection ConstantConditions
-                    if (val2 instanceof Comparable c2) {
-                        compareValue = -c2.compareTo(val1);//need to be reversed because we are comparing the other way around
+                    try {
+                        compareValue = c1.compareTo(val2);
+                    } catch (Exception e) {
+                        if (val2 instanceof Comparable c2) {
+                            compareValue = -c2.compareTo(val1);//need to be reversed because we are comparing the other way around
+                        }
                     }
+                } else {
+                    compareValue = -((Comparable) val2).compareTo(val1);//need to be reversed because we are comparing the other way around
+                }
+
                 return switch (operator) {
                     case EQ -> compareValue == 0;
                     case NEQ -> compareValue != 0;

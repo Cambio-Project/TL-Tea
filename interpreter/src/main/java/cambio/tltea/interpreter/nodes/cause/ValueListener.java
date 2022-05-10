@@ -10,4 +10,8 @@ public class ValueListener<T> extends ValueProvider<T> {
     public void updateValue(T value, ITemporalValue time) {
         super.changeStateAndNotify(value, time);
     }
+
+    public ValueListener<T> clone() {
+        return new ValueListener<>();
+    }
 }

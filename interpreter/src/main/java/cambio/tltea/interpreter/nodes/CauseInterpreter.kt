@@ -3,27 +3,35 @@ package cambio.tltea.interpreter.nodes
 import cambio.tltea.interpreter.nodes.cause.*
 import cambio.tltea.interpreter.utils.ASTManipulator
 import cambio.tltea.parser.core.*
+import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
+import cambio.tltea.parser.core.temporal.TemporalUnaryOperationASTNode
 
 class CauseInterpreter {
 
     private val listeners = mutableListOf<EventActivationListener>()
 
-    fun interpretLTL(root: ASTNode): CauseDescription {
-        val interpretedRoot: CauseNode = interpretAsCause(root)
+    fun interpretMTLCause(
+        root: ASTNode,
+        temporalContext: TemporalOperatorInfo = TemporalOperatorInfo(OperatorToken.GLOBALLY, "[0,inf]")
+    ): CauseDescription {
+        val interpretedRoot: CauseNode = interpretAsCause(root, temporalContext)
         return CauseDescription(interpretedRoot, listeners)
     }
 
 
-    private fun interpretAsCause(root: ASTNode): CauseNode {
+    private fun interpretAsCause(root: ASTNode, temporalContext: TemporalOperatorInfo): CauseNode {
         return when (root) {
+            is TemporalUnaryOperationASTNode -> {
+                return interpretAsCause(root.child, root.toTemporalOperatorInfo())
+            }
             is ValueASTNode -> {
                 interpretAsCauseEvent(root)
             }
             is UnaryOperationASTNode -> {
-                interpretAsCause(root)
+                interpretAsCause(root, temporalContext)
             }
             is BinaryOperationASTNode -> {
-                interpretAsCause(root)
+                interpretAsCause(root, temporalContext)
             }
             else -> {
                 throw IllegalArgumentException("Unsupported ASTNode type: ${root.javaClass.name}");
@@ -32,15 +40,15 @@ class CauseInterpreter {
     }
 
     private fun interpretAsCause(
-        unNode: UnaryOperationASTNode
+        unNode: UnaryOperationASTNode, temporalContext: TemporalOperatorInfo
     ): CauseNode {
 
         when (unNode.operator) {
             OperatorToken.NOT -> {
                 if (unNode.child is ValueASTNode) {
                     @Suppress("UNCHECKED_CAST")
-                    return NotCauseNode(interpretAsCauseEvent(unNode.child as ValueASTNode))
-                } else return (interpretAsCause(ASTManipulator.applyNot(unNode)))
+                    return NotCauseNode(interpretAsCauseEvent(unNode.child as ValueASTNode), temporalContext)
+                } else return (interpretAsCause(ASTManipulator.applyNot(unNode), temporalContext))
             }
             else -> {
                 throw UnsupportedOperationException("Operator not supported for cause description (left side of implication): " + unNode.getOperator());
@@ -76,15 +84,15 @@ class CauseInterpreter {
     }
 
 
-    private fun interpretAsCause(binaryNode: BinaryOperationASTNode): CauseNode {
+    private fun interpretAsCause(binaryNode: BinaryOperationASTNode, temporalContext: TemporalOperatorInfo): CauseNode {
         return when (binaryNode.operator) {
             OperatorToken.AND -> {
-                val children = flattenCause(binaryNode)
-                AndCauseNode(*children.toTypedArray())
+                val children = flattenCause(binaryNode, temporalContext)
+                AndCauseNode(temporalContext, *children.toTypedArray())
             }
             OperatorToken.OR -> {
-                val children = flattenCause(binaryNode)
-                OrCauseNode(*children.toTypedArray())
+                val children = flattenCause(binaryNode, temporalContext)
+                OrCauseNode(temporalContext, *children.toTypedArray())
             }
             else -> {
                 if (OperatorToken.ComparisonOperatorTokens.contains(binaryNode.operator)
@@ -108,21 +116,21 @@ class CauseInterpreter {
         }
     }
 
-    private fun flattenCause(root: BinaryOperationASTNode): List<CauseNode> {
+    private fun flattenCause(root: BinaryOperationASTNode, temporalContext: TemporalOperatorInfo): List<CauseNode> {
         val children = mutableListOf<CauseNode>()
 
         val leftChild = root.leftChild
         if (leftChild is BinaryOperationASTNode && leftChild.operator == root.operator) {
-            children.addAll(flattenCause(leftChild))
+            children.addAll(flattenCause(leftChild, temporalContext))
         } else {
-            children.add(interpretAsCause(leftChild))
+            children.add(interpretAsCause(leftChild, temporalContext))
         }
 
         val rightChild = root.rightChild
         if (rightChild is BinaryOperationASTNode && rightChild.operator == root.operator) {
-            children.addAll(flattenCause(rightChild))
+            children.addAll(flattenCause(rightChild, temporalContext))
         } else {
-            children.add(interpretAsCause(rightChild))
+            children.add(interpretAsCause(rightChild, temporalContext))
         }
 
         return children

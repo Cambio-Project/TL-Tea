@@ -4,7 +4,7 @@ import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangedPublisher;
 import cambio.tltea.parser.core.temporal.ITemporalValue;
 
-public abstract class ValueProvider<T> extends StateChangedPublisher<T> {
+public abstract class ValueProvider<T> extends StateChangedPublisher<T>{
     private boolean isListening;
     protected T currentValue;
 
@@ -27,4 +27,6 @@ public abstract class ValueProvider<T> extends StateChangedPublisher<T> {
     public void stopListening() {
         isListening = false;
     }
+
+    public abstract ValueProvider<T> clone();
 }

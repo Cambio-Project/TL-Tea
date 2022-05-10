@@ -17,7 +17,7 @@ public abstract class StateChangedPublisher<T> {
         subscribers.remove(listener);
     }
 
-    protected final void notifySubscribers(StateChangeEvent<T> event) {
+    protected void notifySubscribers(StateChangeEvent<T> event) {
         for (StateChangeListener<T> listener : subscribers) {
             listener.onEvent(event);
         }

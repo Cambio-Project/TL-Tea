@@ -10,4 +10,7 @@ public class ConstantValueProvider<T> extends ValueProvider<T> {
         this.currentValue = value;
     }
 
+    public ConstantValueProvider<T> clone() {
+        return new ConstantValueProvider<>(currentValue);
+    }
 }

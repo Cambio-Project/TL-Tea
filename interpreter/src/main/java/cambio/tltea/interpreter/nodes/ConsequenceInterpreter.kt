@@ -257,7 +257,7 @@ class ConsequenceInterpreter {
         val left = root.leftChild
         val right = root.rightChild
 
-        val cause = CauseInterpreter().interpretLTL(left)
+        val cause = CauseInterpreter().interpretMTLCause(left,temporalContext)
         val consequence = ConsequenceInterpreter().interpretAsMTL(right, consequenceDescription.triggerManager)
 
         consequenceDescription.triggerManager.eventActivationListeners.addAll(cause.listeners)

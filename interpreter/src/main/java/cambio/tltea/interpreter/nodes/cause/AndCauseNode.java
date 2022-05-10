@@ -2,6 +2,7 @@ package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangeListener;
+import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +17,8 @@ public class AndCauseNode extends CauseNode implements StateChangeListener<Boole
 
     private final AtomicInteger trueCount = new AtomicInteger(0);
 
-    public AndCauseNode( CauseNode... children) {
+    public AndCauseNode(TemporalOperatorInfo temporalContext, CauseNode... children) {
+        super(temporalContext);
         for (CauseNode child : children) {
             this.children.add(child);
             child.subscribe(this);

@@ -2,6 +2,7 @@ package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
 import cambio.tltea.interpreter.nodes.StateChangeListener;
+import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
 
 /**
  * @author Lion Wagner
@@ -10,7 +11,8 @@ public final class NotCauseNode extends CauseNode implements StateChangeListener
 
     private final CauseNode child;
 
-    public NotCauseNode(CauseNode child) {
+    public NotCauseNode(CauseNode child, TemporalOperatorInfo temporalContext) {
+        super(temporalContext);
         this.child = child;
         child.subscribe(this);
     }

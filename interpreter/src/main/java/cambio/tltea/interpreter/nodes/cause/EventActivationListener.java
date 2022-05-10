@@ -1,6 +1,8 @@
 package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.parser.core.temporal.ITemporalValue;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Lion Wagner
@@ -36,5 +38,9 @@ public final class EventActivationListener extends ValueProvider<Boolean> {
 
     public void deactivate(ITemporalValue time) {
         changeStateAndNotify(false, time);
+    }
+
+    public @NotNull EventActivationListener clone() {
+        return new EventActivationListener(eventName);
     }
 }
