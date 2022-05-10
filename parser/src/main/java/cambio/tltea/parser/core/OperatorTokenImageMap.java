@@ -30,6 +30,7 @@ public enum OperatorTokenImageMap {
         INSTANCE.put(OperatorToken.GLOBALLY, "G", "g", "☐");
         INSTANCE.put(OperatorToken.FINALLY, "F", "f", "◇");
         INSTANCE.put(OperatorToken.UNTIL, "U", "u");
+        INSTANCE.put(OperatorToken.SINCE, "S", "s");
         INSTANCE.put(OperatorToken.RELEASE, "R", "r");
         INSTANCE.put(OperatorToken.WEAKUNTIL, "W", "w");
     }
