@@ -1,5 +1,7 @@
 package cambio.tltea.parser.core.temporal;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 public final class TimeInstance implements ITemporalValue {
@@ -7,6 +9,18 @@ public final class TimeInstance implements ITemporalValue {
 
     public TimeInstance(double time) {
         this.time = time;
+    }
+
+    public TimeInstance(int time) {
+        this.time = time;
+    }
+
+    public TimeInstance(@NotNull TimeInstance other) {
+        this.time = other.time;
+    }
+
+    public TimeInstance(@NotNull Number time) {
+        this.time = time.doubleValue();
     }
 
     public double getTime() {

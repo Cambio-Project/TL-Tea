@@ -1,7 +1,8 @@
-package cambio.tltea.interpreter.nodes.requirements;
+package cambio.tltea.interpreter.nodes.cause;
 
 import cambio.tltea.interpreter.nodes.StateChangeEvent;
-import cambio.tltea.interpreter.nodes.StateChangedPublisher;
+import cambio.tltea.interpreter.nodes.StateChangeListener;
+import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,19 +10,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Lion Wagner
  */
-public class AndInteractionNode extends InteractionNode<Boolean> implements InteractionListener<Boolean> {
+public class AndCauseNode extends CauseNode implements StateChangeListener<Boolean>  {
     private boolean state = false;
 
-    private final LinkedList<StateChangedPublisher<Boolean>> children = new LinkedList<>();
+    private final LinkedList<CauseNode> children = new LinkedList<>();
 
     private final AtomicInteger trueCount = new AtomicInteger(0);
 
-    public AndInteractionNode(InteractionNode<Boolean>... children) {
-        for (InteractionNode<Boolean> child : children) {
+    public AndCauseNode(TemporalOperatorInfo temporalContext, CauseNode... children) {
+        super(temporalContext);
+        for (CauseNode child : children) {
             this.children.add(child);
             child.subscribe(this);
 
-            if (child.getValue()) {
+            if (child.getCurrentValue()) {
                 trueCount.incrementAndGet();
             }
         }
@@ -40,13 +42,13 @@ public class AndInteractionNode extends InteractionNode<Boolean> implements Inte
             state = trueCount.get() == this.children.size();
 
             if (oldSate != state) {
-                notifySubscribers(new StateChangeEvent<>(this, true, false));
+                notifySubscribers(new StateChangeEvent<>(this, true, false, event.when()));
             }
         }
     }
 
     @Override
-    public Boolean getValue() {
+    public Boolean getCurrentValue() {
         return state;
     }
 

@@ -32,7 +32,7 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     }
 
     public BinaryOperationASTNode(LiteralOperatorInfo operator, ASTNode left, ASTNode right) {
-        this(operator.operatorImage(), left, right);
+        this(operator.operator(), left, right);
     }
 
 
@@ -45,12 +45,11 @@ public class BinaryOperationASTNode extends OperatorASTNode {
      */
     public final BinaryOperationASTNode seepIn(IOperatorInfo operatorInfo, ASTNode leftNode) {
 
-        if (operatorPriority > BinaryOperatorPrecedenceMap.INSTANCE.getPrecedence(
-                OperatorTokenImageMap.INSTANCE.getToken(operatorInfo.operatorImage()))
+        if (operatorPriority > BinaryOperatorPrecedenceMap.INSTANCE.getPrecedence(operatorInfo.operator())
             || this.isBracketed()) {
             BinaryOperationASTNode newParent = null;
             if (operatorInfo instanceof LiteralOperatorInfo info) {
-                newParent = new BinaryOperationASTNode(info.operatorImage(), leftNode, this);
+                newParent = new BinaryOperationASTNode(info.operator(), leftNode, this);
             } else if (operatorInfo instanceof TemporalOperatorInfo info) {
                 newParent = new TemporalBinaryOperationASTNode(info, leftNode, this);
             }
@@ -65,7 +64,7 @@ public class BinaryOperationASTNode extends OperatorASTNode {
             } else {
                 BinaryOperationASTNode newChild = null;
                 if (operatorInfo instanceof LiteralOperatorInfo info) {
-                    newChild = new BinaryOperationASTNode(info.operatorImage(), leftNode, left);
+                    newChild = new BinaryOperationASTNode(info.operator(), leftNode, left);
                 }
                 if (operatorInfo instanceof TemporalOperatorInfo info) {
                     newChild = new TemporalBinaryOperationASTNode(info, leftNode, left);
@@ -86,6 +85,11 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     }
 
     @Override
+    public String toFormulaString() {
+        return operator.getShorthandImage();
+    }
+
+    @Override
     public ASTNode clone() {
         return new BinaryOperationASTNode(operator, left.clone(), right.clone());
     }
@@ -93,6 +97,11 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     @Override
     public int getSize() {
         return 1 + left.getSize() + right.getSize();
+    }
+
+    @Override
+    public int getTreeWidth() {
+        return left.getTreeWidth() + right.getTreeWidth();
     }
 
     @Override
@@ -115,10 +124,12 @@ public class BinaryOperationASTNode extends OperatorASTNode {
 
     public void setLeftChild(ASTNode left) {
         this.left = left;
+        left.setParent(this);
     }
 
     public void setRightChild(ASTNode right) {
         this.right = right;
+        right.setParent(this);
     }
 }
 
