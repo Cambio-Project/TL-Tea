@@ -10,7 +10,7 @@ internal class BehaviorInterpreterTest {
     @Test
     @Throws(ParseException::class)
     fun debugTest() {
-        val input = "((P)&(!!(C))&(D))->((Q)==1234)"
+        val input = "((P)&(!!(C))|!(D))->((Q)==1234)"
         val ast = MTLParser(input).parse()
         val result = interpretAsBehavior(ast)
         result.activateProcessing();
