@@ -18,4 +18,9 @@ public abstract class OperatorASTNode extends ASTNode {
     public OperatorToken getOperator() {
         return operator;
     }
+
+    @Override
+    public String toString() {
+        return operator.toString();
+    }
 }

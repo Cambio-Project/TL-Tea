@@ -42,6 +42,11 @@ public final class TemporalUnaryOperationASTNode extends UnaryOperationASTNode i
 
     @Override
     public String toFormulaString() {
-        return super.toFormulaString()  + this.getTemporalValue().toString();
+        return super.toFormulaString() + this.getTemporalValue().toString();
+    }
+
+    @Override
+    public ASTNode clone() {
+        return new TemporalUnaryOperationASTNode(this.toTemporalOperatorInfo(), this.getChild().clone());
     }
 }

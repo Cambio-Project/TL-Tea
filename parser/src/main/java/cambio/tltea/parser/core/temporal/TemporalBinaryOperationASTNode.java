@@ -21,7 +21,7 @@ public final class TemporalBinaryOperationASTNode extends BinaryOperationASTNode
     }
 
     @Override
-    public TemporalOperatorInfo toTemporalOperatorInfo(){
+    public TemporalOperatorInfo toTemporalOperatorInfo() {
         return new TemporalOperatorInfo(this.getOperator(), this.getTemporalValue());
     }
 
@@ -37,7 +37,14 @@ public final class TemporalBinaryOperationASTNode extends BinaryOperationASTNode
 
     @Override
     public String toFormulaString() {
-        return super.toFormulaString()  + this.getTemporalValue().toString();
+        return super.toFormulaString() + this.getTemporalValue().toString();
+    }
+
+    @Override
+    public ASTNode clone() {
+        return new TemporalBinaryOperationASTNode(this.toTemporalOperatorInfo(),
+                                                  this.getLeftChild().clone(),
+                                                  this.getRightChild().clone());
     }
 
 }
