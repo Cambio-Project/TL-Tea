@@ -6,14 +6,14 @@ import org.jetbrains.annotations.NotNull;
  * @author Lion Wagner
  */
 public final class ValueASTNode extends ASTNode {
-    private final String value;
+    private final @NotNull String value;
 
-    public ValueASTNode(String value) {
+    public ValueASTNode(@NotNull String value) {
         super();
         this.value = value;
     }
 
-    public String getValue() {
+    public @NotNull String getValue() {
         return value;
     }
 
@@ -65,5 +65,9 @@ public final class ValueASTNode extends ASTNode {
         } else {
             throw new IllegalStateException("Value does not contain event name");
         }
+    }
+
+    public boolean containsPropertyAccess() {
+        return value.contains("$");
     }
 }

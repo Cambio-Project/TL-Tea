@@ -13,14 +13,14 @@ class ComparisonCauseNodeTest {
 
 
     private static void testComparison(boolean expected,
-                                       ValueProvider<?> value1,
-                                       ValueProvider<?> value2,
+                                       ValueListener<?> value1,
+                                       ValueListener<?> value2,
                                        OperatorToken op) {
         ComparisonCauseNode node = new ComparisonCauseNode(op, null, value1, value2);
         Assertions.assertEquals(expected, node.getCurrentValue());
     }
 
-    private static void testThrowsException(ValueProvider<?> value1, ValueProvider<?> value2, OperatorToken op) {
+    private static void testThrowsException(ValueListener<?> value1, ValueListener<?> value2, OperatorToken op) {
         try {
             new ComparisonCauseNode(op, null, value1, value2).getCurrentValue();
         } catch (IllegalStateException | IllegalArgumentException e) {
@@ -53,8 +53,8 @@ class ComparisonCauseNodeTest {
     }
 
 
-    private static void testComparisonOperators(ValueProvider<Number> smallProvider,
-                                                ValueProvider<Number> largeProvider) {
+    private static void testComparisonOperators(ValueListener<Number> smallProvider,
+                                                ValueListener<Number> largeProvider) {
         testComparison(true, smallProvider, smallProvider, OperatorToken.EQ);
         testComparison(true, smallProvider, smallProvider.clone(), OperatorToken.EQ);
         testComparison(false, smallProvider, smallProvider, OperatorToken.NEQ);

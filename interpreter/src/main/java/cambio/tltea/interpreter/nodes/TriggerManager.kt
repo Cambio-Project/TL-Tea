@@ -1,6 +1,6 @@
 package cambio.tltea.interpreter.nodes
 
-import cambio.tltea.interpreter.nodes.cause.EventActivationListener
+import cambio.tltea.interpreter.nodes.cause.ValueListener
 import cambio.tltea.interpreter.nodes.consequence.ActivationData
 import java.util.function.Consumer
 
@@ -9,7 +9,7 @@ import java.util.function.Consumer
  */
 class TriggerManager : ISubscribableTriggerNotifier {
 
-    internal val eventActivationListeners: MutableCollection<EventActivationListener> = HashSet()
+    internal val eventActivationListeners: MutableCollection<ValueListener<*>> = HashSet()
 
     private val anySubscribers: MutableCollection<Consumer<ActivationData<*>>> = HashSet()
 
@@ -38,6 +38,10 @@ class TriggerManager : ISubscribableTriggerNotifier {
     internal fun trigger(activationData: ActivationData<*>) {
         anySubscribers.forEach { it.accept(activationData) }
         filteredSubscribers[activationData.javaClass]?.forEach { it.accept(activationData) }
+    }
+
+    fun getEventActivationListeners(): List<ValueListener<*>> {
+        return listOf(*eventActivationListeners.toTypedArray())
     }
 
 }

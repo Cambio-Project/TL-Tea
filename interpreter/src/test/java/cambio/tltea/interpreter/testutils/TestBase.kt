@@ -50,7 +50,8 @@ open class TestBase {
     }
 
     protected fun getEventListeners(eventName: String): EventActivationListener? {
-        return triggerManager.eventActivationListeners.find { eventActivationListener -> eventActivationListener.eventName == eventName }
+        return triggerManager.eventActivationListeners
+            .find { eventActivationListener -> eventActivationListener.valueOrEventName == eventName } as EventActivationListener?
     }
 
     protected fun assertLogSizes(eventActivation: Int, eventPrevention: Int, valueEvents: Int) {

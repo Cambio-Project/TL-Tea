@@ -9,15 +9,15 @@ import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
  */
 public class ComparisonCauseNode extends CauseNode {
     private final OperatorToken operator;
-    private final ValueProvider<?> left;
-    private final ValueProvider<?> right;
+    private final ValueListener<?> left;
+    private final ValueListener<?> right;
 
     private boolean lastValue = false;
 
     public ComparisonCauseNode(OperatorToken operator,
                                TemporalOperatorInfo temporalContext,
-                               ValueProvider<?> left,
-                               ValueProvider<?> right) {
+                               ValueListener<?> left,
+                               ValueListener<?> right) {
         super(temporalContext);
         if (!OperatorToken.ComparisonOperatorTokens.contains(operator)) {
             throw new IllegalArgumentException("Operator not supported as comparison: " + operator);

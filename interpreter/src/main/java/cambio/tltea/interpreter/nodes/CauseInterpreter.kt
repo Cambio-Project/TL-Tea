@@ -8,7 +8,7 @@ import cambio.tltea.parser.core.temporal.TemporalUnaryOperationASTNode
 
 class CauseInterpreter {
 
-    private val listeners = mutableListOf<EventActivationListener>()
+    private val listeners = mutableListOf<ValueListener<*>>()
 
     fun interpretMTLCause(
         root: ASTNode,
@@ -47,7 +47,10 @@ class CauseInterpreter {
             OperatorToken.NOT -> {
                 if (unNode.child is ValueASTNode) {
                     @Suppress("UNCHECKED_CAST")
-                    return NotCauseNode(interpretAsCauseEvent(unNode.child as ValueASTNode, temporalContext), temporalContext)
+                    return NotCauseNode(
+                        interpretAsCauseEvent(unNode.child as ValueASTNode, temporalContext),
+                        temporalContext
+                    )
                 } else return (interpretAsCause(ASTManipulator.applyNot(unNode), temporalContext))
             }
             else -> {
@@ -62,9 +65,12 @@ class CauseInterpreter {
             listeners.add(eventActivationListener)
 
             //wrap event activation in a ==True comparison
-            return ComparisonCauseNode(OperatorToken.EQ, temporalContext, eventActivationListener, ConstantValueProvider(true))
-        } else if (valueNode.value.contains("$")) {
-            TODO("A value watcher cannot be created yet.")
+            return ComparisonCauseNode(
+                OperatorToken.EQ,
+                temporalContext,
+                eventActivationListener,
+                ConstantValueProvider(true)
+            )
         }
         throw UnsupportedOperationException(
             "Value %s cannot be interpreted as event Activation. Try wrapping it in parenthesis like '(%s)'.".format(
@@ -74,7 +80,12 @@ class CauseInterpreter {
         )
     }
 
-    private fun interpretAsValue(valueNode: ValueASTNode): ValueProvider<*> {
+    private fun interpretAsValueProvider(valueNode: ValueASTNode): ValueListener<*> {
+        if (valueNode.containsPropertyAccess()) {
+            val listener = ValueListener<Int>(valueNode.value)
+            listeners.add(listener)
+            return listener
+        }
         try {
             val d = valueNode.value.toDouble()
             return ConstantValueProvider(d)
@@ -102,8 +113,8 @@ class CauseInterpreter {
                     return ComparisonCauseNode(
                         binaryNode.operator,
                         null,
-                        interpretAsValue(binaryNode.leftChild as ValueASTNode),
-                        interpretAsValue(binaryNode.rightChild as ValueASTNode)
+                        interpretAsValueProvider(binaryNode.leftChild as ValueASTNode),
+                        interpretAsValueProvider(binaryNode.rightChild as ValueASTNode)
                     )
                 }
 

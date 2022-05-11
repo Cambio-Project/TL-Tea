@@ -1,6 +1,7 @@
 package cambio.tltea.interpreter
 
 import cambio.tltea.interpreter.Interpreter.interpretAsBehavior
+import cambio.tltea.interpreter.nodes.cause.EventActivationListener
 import cambio.tltea.parser.core.temporal.TimeInstance
 import cambio.tltea.parser.mtl.generated.MTLParser
 import cambio.tltea.parser.mtl.generated.ParseException
@@ -21,10 +22,12 @@ internal class BehaviorInterpreterTest {
         }
 
         result.triggerManager.eventActivationListeners
-            .filter { !it.eventName.contains("F") }
+            .map { it as EventActivationListener }
+            .filter { !it.valueOrEventName.contains("F") }
             .forEach { it.activate(TimeInstance(0.0)) }
         result.triggerManager.eventActivationListeners
-            .filter { it.eventName.contains("F") }
+            .map { it as EventActivationListener }
+            .filter { it.valueOrEventName.contains("F") }
             .forEach { it.activate(TimeInstance(0.0)) }
 
         println(result)

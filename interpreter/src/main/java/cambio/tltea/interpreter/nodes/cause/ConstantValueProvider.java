@@ -3,10 +3,10 @@ package cambio.tltea.interpreter.nodes.cause;
 /**
  * @author Lion Wagner
  */
-public class ConstantValueProvider<T> extends ValueProvider<T> {
+public class ConstantValueProvider<T> extends ValueListener<T> {
 
     public ConstantValueProvider(T value) {
-        super();
+        super("CONSTANT");
         this.currentValue = value;
     }
 
