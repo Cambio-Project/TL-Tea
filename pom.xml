@@ -7,7 +7,7 @@
     <name>TL-Tea</name>
     <groupId>cambio.tltea</groupId>
     <artifactId>tltea</artifactId>
-    <version>0.1.1a</version>
+    <version>0.3.1</version>
     <packaging>pom</packaging>
 
     <properties>

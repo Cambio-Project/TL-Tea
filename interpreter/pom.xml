@@ -7,7 +7,7 @@
     <parent>
         <groupId>cambio.tltea</groupId>
         <artifactId>tltea</artifactId>
-        <version>0.1.1a</version>
+        <version>0.3.1</version>
     </parent>
 
     <name>TL-Tea-Interpreter</name>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>cambio.tltea</groupId>
             <artifactId>parser</artifactId>
-            <version>0.1.1a</version>
+            <version>0.3.1</version>
         </dependency>
     </dependencies>
 </project>
