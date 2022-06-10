@@ -384,4 +384,10 @@ public class MTLRegressionTests {
         ASTNode root2 = parser.parse();
         ASTTreeComparison.compareAST(unaryNode2, root2);
     }
+
+
+    @Test
+    void squareBracketsInEventDescription() throws ParseException {
+        var result =MTLParser.parse("G(hello[World])");
+    }
 }
