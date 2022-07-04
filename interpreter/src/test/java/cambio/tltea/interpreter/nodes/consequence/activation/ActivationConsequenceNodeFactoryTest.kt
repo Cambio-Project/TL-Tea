@@ -1,6 +1,7 @@
 package cambio.tltea.interpreter.nodes.consequence.activation
 
 import cambio.tltea.interpreter.Interpreter
+import cambio.tltea.interpreter.nodes.ActivationConsequenceNodeFactory
 import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 import org.apache.commons.lang3.RandomStringUtils

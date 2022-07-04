@@ -4,8 +4,6 @@ import cambio.tltea.interpreter.nodes.consequence.AndConsequenceNode
 import cambio.tltea.interpreter.nodes.consequence.ConsequenceNode
 import cambio.tltea.interpreter.nodes.consequence.OrConsequenceNode
 import cambio.tltea.interpreter.nodes.consequence.activation.ActivationConsequenceNode
-import cambio.tltea.interpreter.nodes.consequence.activation.ActivationConsequenceNodeFactory
-import cambio.tltea.interpreter.nodes.consequence.activation.EventPreventionConsequenceNode
 import cambio.tltea.interpreter.nodes.consequence.activation.ValueEventConsequenceNode
 import cambio.tltea.interpreter.utils.ASTManipulator
 import cambio.tltea.parser.core.*

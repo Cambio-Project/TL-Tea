@@ -1,4 +1,4 @@
-package cambio.tltea.interpreter
+package cambio.tltea.interpreter.nodes.cause
 
 import cambio.tltea.interpreter.testutils.TestBase
 import cambio.tltea.parser.core.temporal.TimeInstance

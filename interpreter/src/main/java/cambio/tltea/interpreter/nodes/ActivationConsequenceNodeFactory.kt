@@ -1,6 +1,12 @@
-package cambio.tltea.interpreter.nodes.consequence.activation
+package cambio.tltea.interpreter.nodes
 
-import cambio.tltea.interpreter.nodes.TriggerManager
+import cambio.tltea.interpreter.nodes.consequence.activation.*
+import cambio.tltea.interpreter.nodes.consequence.activation.EventActivationConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.EventPreventionConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.LoadModificationConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.ServiceFailureConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.ServiceStartConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.ServiceStopConsequenceNode
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 
 object ActivationConsequenceNodeFactory {
