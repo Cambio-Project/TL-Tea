@@ -1,6 +1,12 @@
 package cambio.tltea.interpreter.nodes
 
-import cambio.tltea.interpreter.nodes.consequence.*
+import cambio.tltea.interpreter.nodes.consequence.AndConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.ConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.OrConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.ActivationConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.ActivationConsequenceNodeFactory
+import cambio.tltea.interpreter.nodes.consequence.activation.EventPreventionConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.ValueEventConsequenceNode
 import cambio.tltea.interpreter.utils.ASTManipulator
 import cambio.tltea.parser.core.*
 import cambio.tltea.parser.core.temporal.*
@@ -209,7 +215,12 @@ class ConsequenceInterpreter {
             val child = node.child
             if (child is ValueASTNode) {
                 val value = if (child.containsEventName()) child.eventName else child.value
-                return EventPreventionConsequenceNode(consequenceDescription.triggerManager, temporalContext, value)
+                return ActivationConsequenceNodeFactory.getActivationConsequenceNode(
+                    value,
+                    consequenceDescription.triggerManager,
+                    temporalContext,
+                    true
+                )
             } else if (child is UnaryOperationASTNode && child.operator == OperatorToken.NOT) {
                 return interpret(
                     ASTManipulator.removeDoubleNot(node),
@@ -235,10 +246,10 @@ class ConsequenceInterpreter {
         consequenceDescription: ConsequenceDescription
     ): ActivationConsequenceNode {
         if (node.containsEventName()) {
-            return EventActivationConsequenceNode(
+            return ActivationConsequenceNodeFactory.getActivationConsequenceNode(
+                node.eventName,
                 consequenceDescription.triggerManager,
-                temporalContext,
-                node.eventName
+                temporalContext
             )
         } else {
             throw IllegalArgumentException("Cannot interpret node of type ${node.javaClass.simpleName}")
@@ -257,7 +268,7 @@ class ConsequenceInterpreter {
         val left = root.leftChild
         val right = root.rightChild
 
-        val cause = CauseInterpreter().interpretMTLCause(left,temporalContext)
+        val cause = CauseInterpreter().interpretMTLCause(left, temporalContext)
         val consequence = ConsequenceInterpreter().interpretAsMTL(right, consequenceDescription.triggerManager)
 
         consequenceDescription.triggerManager.eventActivationListeners.addAll(cause.listeners)

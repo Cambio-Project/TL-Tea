@@ -3,7 +3,7 @@ package cambio.tltea.interpreter
 import cambio.tltea.interpreter.nodes.ConsequenceDescription
 import cambio.tltea.interpreter.nodes.ISubscribableTriggerNotifier
 import cambio.tltea.interpreter.nodes.TriggerManager
-import cambio.tltea.interpreter.nodes.consequence.ActivationData
+import cambio.tltea.interpreter.nodes.consequence.activation.ActivationData
 import cambio.tltea.parser.core.ASTNode
 import java.util.function.Consumer
 

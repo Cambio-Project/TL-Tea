@@ -1,7 +1,7 @@
 package cambio.tltea.interpreter.nodes
 
 import cambio.tltea.interpreter.nodes.cause.ValueListener
-import cambio.tltea.interpreter.nodes.consequence.ActivationData
+import cambio.tltea.interpreter.nodes.consequence.activation.ActivationData
 import java.util.function.Consumer
 
 /**

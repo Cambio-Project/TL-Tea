@@ -4,10 +4,11 @@ import cambio.tltea.interpreter.BehaviorInterpretationResult
 import cambio.tltea.interpreter.Interpreter
 import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.interpreter.nodes.cause.EventActivationListener
-import cambio.tltea.interpreter.nodes.consequence.EventActivationData
-import cambio.tltea.interpreter.nodes.consequence.EventPreventionData
-import cambio.tltea.interpreter.nodes.consequence.ValueEventActivationData
+import cambio.tltea.interpreter.nodes.consequence.activation.EventActivationData
+import cambio.tltea.interpreter.nodes.consequence.activation.EventPreventionData
+import cambio.tltea.interpreter.nodes.consequence.activation.ValueEventActivationData
 import cambio.tltea.parser.core.temporal.ITemporalValue
+import cambio.tltea.parser.core.temporal.TimeInstance
 import cambio.tltea.parser.mtl.generated.MTLParser
 import org.junit.jupiter.api.Assertions.assertEquals
 
@@ -61,7 +62,7 @@ open class TestBase {
         assertEquals(eventActivation + eventPrevention + valueEvents, generalActivationLog.size)
     }
 
-    protected fun activateEvent(eventName: String, `when`: ITemporalValue) {
+    protected fun activateEvent(eventName: String, `when`: ITemporalValue = TimeInstance(0)) {
         getEventListeners(eventName)?.activate(`when`)
     }
 
