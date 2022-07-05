@@ -66,7 +66,7 @@ internal class ServiceStopConsequenceNode(
     val serviceName: String = extractServiceName("stop", data_str)
 
     override fun activateConsequence() {
-        triggerManager.trigger(ServiceFailureEventData(serviceName, temporalContext))
+        triggerManager.trigger(ServiceStopEventData(serviceName, temporalContext))
     }
 
     override fun deactivateConsequence() {}

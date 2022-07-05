@@ -12,14 +12,17 @@ class EventPreventionData(eventName: String, temporalContext: TemporalOperatorIn
 class EventActivationData(eventName: String, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(eventName, temporalContext)
 
-class ServiceFailureEventData(serviceName: String, temporalContext: TemporalOperatorInfo) :
+class ServiceFailureEventData(val serviceName: String, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(serviceName, temporalContext)
 
-class ServiceStartEventData(serviceName: String, temporalContext: TemporalOperatorInfo) :
+class ServiceStartEventData(val serviceName: String, temporalContext: TemporalOperatorInfo) :
+    ActivationData<String>(serviceName, temporalContext)
+
+class ServiceStopEventData(val serviceName: String, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(serviceName, temporalContext)
 
 class LoadModificationEventData(
-    load_str: String, modificationValue: Double, isFactor: Boolean, temporalContext: TemporalOperatorInfo
+    val load_str: String, val modificationValue: Double, val isFactor: Boolean, temporalContext: TemporalOperatorInfo
 ) : ActivationData<String>(load_str, temporalContext)
 
 
