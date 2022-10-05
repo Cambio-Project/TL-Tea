@@ -22,7 +22,7 @@ class ServiceStopEventData(val serviceName: String, temporalContext: TemporalOpe
     ActivationData<String>(serviceName, temporalContext)
 
 class LoadModificationEventData(
-    val load_str: String, val modificationValue: Double, val isFactor: Boolean, temporalContext: TemporalOperatorInfo
+    val load_str: String, val modificationValue: Double, val functionType: String, val isFactor: Boolean, temporalContext: TemporalOperatorInfo
 ) : ActivationData<String>(load_str, temporalContext)
 
 

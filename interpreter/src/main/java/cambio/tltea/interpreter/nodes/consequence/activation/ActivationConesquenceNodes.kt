@@ -96,29 +96,32 @@ internal class LoadModificationConsequenceNode(
 ) : ActivationConsequenceNode(triggerManager, temporalContext) {
 
     val endpointName: String
+    val functionType: String
     val loadModifier: Double
     val isFactor: Boolean
 
     init {
-        //expected format load[x?[+-]<float>:<endpoint name>]
-        val regex = Regex("load\\[(x?)([+-]?[0-9]+|[0-9]*.[0-9]+):(.+)]", RegexOption.IGNORE_CASE)
+        //expected format load[x?[+-]<float>[:<type>]:<endpoint name>]
+        val regex = Regex("load\\[(x?)([+-]?[0-9]+|[0-9]*.[0-9]+)(:(.+))?:(.+)]", RegexOption.IGNORE_CASE)
         val match = regex.matchEntire(data_str) ?: throw IllegalArgumentException(
             "Invalid load modification description string '$data_str'.\n" +
-                    "Expected format 'load[x<float>:<endpoint name>]'.\n" +
+                    "Expected format 'load[x<float>[:<type>]:<endpoint name>]'.\n" +
                     "The 'x' in front of the float is optional to select between factor or fixed value. "
         )
 
         try {
             this.isFactor = match.groupValues[1].isNotBlank()
             this.loadModifier = match.groupValues[2].toDouble()
-            this.endpointName = match.groupValues[3]
+            this.functionType = match.groupValues[4].toString()
+            this.endpointName = match.groupValues[5].toString()
+
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException("Invalid number format in load modification description string '$data_str'")
         }
     }
 
     override fun activateConsequence() {
-        triggerManager.trigger(LoadModificationEventData(endpointName, loadModifier, isFactor, temporalContext))
+        triggerManager.trigger(LoadModificationEventData(endpointName, loadModifier, functionType, isFactor, temporalContext))
     }
 
     override fun deactivateConsequence() {}
