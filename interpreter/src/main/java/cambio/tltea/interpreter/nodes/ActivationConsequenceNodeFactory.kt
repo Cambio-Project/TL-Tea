@@ -28,6 +28,8 @@ object ActivationConsequenceNodeFactory {
                 ServiceStopConsequenceNode(eventText, triggerManager, temporalContext)
             } else if (eventTextLowercase.startsWith("load")) {
                 LoadModificationConsequenceNode(eventText, triggerManager, temporalContext)
+            } else if (eventTextLowercase.startsWith("event")) {
+                HookEventConsequenceNode(eventText, triggerManager, temporalContext)
             } else {
                 throw IllegalArgumentException("Could not find an event activation mode. Returning EventActivationConsequenceNode")
             }

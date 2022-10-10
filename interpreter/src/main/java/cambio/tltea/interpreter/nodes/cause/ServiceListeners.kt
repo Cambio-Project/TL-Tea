@@ -8,6 +8,5 @@ class InstanceCountListener(valueOrEventName: String, serviceName: String) :
 class ServiceStateListener(valueOrEventName: String, serviceName: String) :
     ServiceListener<String>(valueOrEventName, serviceName)
 
-
 class LoadListener(valueOrEventName: String, serviceName: String) :
     ServiceListener<Number>(valueOrEventName, serviceName)

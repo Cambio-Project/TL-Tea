@@ -23,7 +23,8 @@ open class TestBase {
 
 
     protected fun interpretFormula(formula: String): BehaviorInterpretationResult {
-        val interpretAsBehavior = Interpreter.interpretAsBehavior(MTLParser.parse(formula))
+        val interpretAsBehavior = Interpreter.interpretAsBehavior(MTLParser.parse(formula)
+        )
 
         currentInterpretationResult = interpretAsBehavior
         triggerManager = interpretAsBehavior.triggerManager

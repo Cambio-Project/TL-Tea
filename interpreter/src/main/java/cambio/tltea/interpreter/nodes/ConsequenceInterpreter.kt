@@ -35,14 +35,17 @@ import cambio.tltea.parser.core.temporal.*
 
 //until[x,y] => left is true till right is true
 //Roughly, but not exactly G[x,y](!right -> left)
-class ConsequenceInterpreter {
+class ConsequenceInterpreter() {
 
     /**
      * @param mtlRoot the root of the parsed MTL formula
      * @param triggerManager this parameter can be used to combine multiple {@link TriggerNotifier}s from previous interpretations
      */
     @JvmOverloads
-    fun interpretAsMTL(mtlRoot: ASTNode, triggerManager: TriggerManager = TriggerManager()): ConsequenceDescription {
+    fun interpretAsMTL(
+        mtlRoot: ASTNode,
+        triggerManager: TriggerManager = TriggerManager()
+    ): ConsequenceDescription {
 
         val consequenceDescription = ConsequenceDescription(triggerManager)
         //gather initial temporal info
@@ -69,21 +72,25 @@ class ConsequenceInterpreter {
                 temporalContext,
                 consequenceDescription
             )
+
             is TemporalUnaryOperationASTNode -> interpretTemporalUnaryOperation(
                 node,
                 temporalContext,
                 consequenceDescription
             )
+
             is BinaryOperationASTNode -> interpretBinaryOperation(
                 node,
                 temporalContext,
                 consequenceDescription
             )
+
             is UnaryOperationASTNode -> interpretUnaryOperation(
                 node,
                 temporalContext,
                 consequenceDescription
             )
+
             is ValueASTNode -> interpretValueNode(node, temporalContext, consequenceDescription)
             else -> {
                 throw IllegalArgumentException("Cannot interpret node of type ${node.javaClass.simpleName}")
@@ -171,6 +178,7 @@ class ConsequenceInterpreter {
                     //create implication node
                     return interpretImplication(node, temporalContext, consequenceDescription)
                 }
+
                 OperatorToken.AND -> {
                     //create consequence "and" node
                     val children = ASTManipulator.flatten(node)
@@ -179,6 +187,7 @@ class ConsequenceInterpreter {
                         temporalContext,
                         children.map { interpretShorthand(it) })
                 }
+
                 OperatorToken.OR -> {
                     //create consequence "or" node
                     val children = ASTManipulator.flatten(node)
@@ -187,6 +196,7 @@ class ConsequenceInterpreter {
                         temporalContext,
                         children.map { interpretShorthand(it) })
                 }
+
                 OperatorToken.IFF -> {
                     //split <-> into <- and ->
                     //this only works in rare cases
@@ -196,6 +206,7 @@ class ConsequenceInterpreter {
                         consequenceDescription
                     )
                 }
+
                 else -> {
                     throw IllegalArgumentException("Cannot interpret node of type ${node.javaClass.simpleName}")
                 }
@@ -267,7 +278,10 @@ class ConsequenceInterpreter {
         val right = root.rightChild
 
         val cause = CauseInterpreter().interpretMTLCause(left, temporalContext)
-        val consequence = ConsequenceInterpreter().interpretAsMTL(right, consequenceDescription.triggerManager)
+        val consequence = ConsequenceInterpreter().interpretAsMTL(
+            right,
+            consequenceDescription.triggerManager
+        )
 
         consequenceDescription.triggerManager.eventActivationListeners.addAll(cause.listeners)
 

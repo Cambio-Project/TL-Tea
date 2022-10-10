@@ -9,7 +9,9 @@ import cambio.tltea.parser.mtl.generated.MTLParser
  */
 object Interpreter {
 
-    fun interpretAsBehavior(mlt_formula: String): BehaviorInterpretationResult {
+    fun interpretAsBehavior(
+        mlt_formula: String
+    ): BehaviorInterpretationResult {
         return interpretAsBehavior(MTLParser.parse(mlt_formula))
     }
 

@@ -6,7 +6,7 @@ import cambio.tltea.parser.core.*
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 import cambio.tltea.parser.core.temporal.TemporalUnaryOperationASTNode
 
-class CauseInterpreter {
+class CauseInterpreter() {
 
     private val listeners = mutableListOf<ValueListener<*>>()
 
@@ -24,15 +24,19 @@ class CauseInterpreter {
             is TemporalUnaryOperationASTNode -> {
                 return interpretAsCause(root.child, root.toTemporalOperatorInfo())
             }
+
             is ValueASTNode -> {
                 interpretAsCauseEvent(root, temporalContext)
             }
+
             is UnaryOperationASTNode -> {
                 interpretAsCause(root, temporalContext)
             }
+
             is BinaryOperationASTNode -> {
                 interpretAsCause(root, temporalContext)
             }
+
             else -> {
                 throw IllegalArgumentException("Unsupported ASTNode type: ${root.javaClass.name}");
             }
@@ -45,14 +49,14 @@ class CauseInterpreter {
 
         when (unNode.operator) {
             OperatorToken.NOT -> {
-                if (unNode.child is ValueASTNode) {
-                    @Suppress("UNCHECKED_CAST")
-                    return NotCauseNode(
+                return if (unNode.child is ValueASTNode) {
+                    NotCauseNode(
                         interpretAsCauseEvent(unNode.child as ValueASTNode, temporalContext),
                         temporalContext
                     )
-                } else return (interpretAsCause(ASTManipulator.applyNot(unNode), temporalContext))
+                } else (interpretAsCause(ASTManipulator.applyNot(unNode), temporalContext))
             }
+
             else -> {
                 throw UnsupportedOperationException("Operator not supported for cause description (left side of implication): " + unNode.getOperator());
             }
@@ -61,9 +65,25 @@ class CauseInterpreter {
 
     private fun interpretAsCauseEvent(valueNode: ValueASTNode, temporalContext: TemporalOperatorInfo): CauseNode {
         if (valueNode.containsEventName()) {
-            val eventActivationListener = EventActivationListener(valueNode.eventName)
-            listeners.add(eventActivationListener)
+            val eventName = valueNode.eventName
+            val eventActivationListener: ValueListener<Boolean>
+            val eventTextLowercase = valueNode.eventName.lowercase()
 
+            if (eventTextLowercase.startsWith("event")) {
+                // handle named events
+                val regex = Regex("event\\[(.+)]", RegexOption.IGNORE_CASE)
+                val match = regex.matchEntire(eventName) ?: throw IllegalArgumentException(
+                    "Invalid load modification description string '$eventName'.\n" +
+                            "Expected format 'load[x<float>[:<type>]:<endpoint name>]'.\n" +
+                            "The 'x' in front of the float is optional to select between factor or fixed value. "
+                )
+                val extractedEventName = match.groupValues[1]
+                eventActivationListener = EventActivationListener("event.$extractedEventName")
+                listeners.add(eventActivationListener)
+            } else {
+                eventActivationListener = EventActivationListener(eventName)
+                listeners.add(eventActivationListener)
+            }
             //wrap event activation in a ==True comparison
             return ComparisonCauseNode(
                 OperatorToken.EQ,
@@ -101,10 +121,12 @@ class CauseInterpreter {
                 val children = flattenCause(binaryNode, temporalContext)
                 AndCauseNode(temporalContext, *children.toTypedArray())
             }
+
             OperatorToken.OR -> {
                 val children = flattenCause(binaryNode, temporalContext)
                 OrCauseNode(temporalContext, *children.toTypedArray())
             }
+
             else -> {
                 if (OperatorToken.ComparisonOperatorTokens.contains(binaryNode.operator)
                     && binaryNode.leftChild is ValueASTNode

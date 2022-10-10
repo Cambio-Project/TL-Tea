@@ -112,8 +112,8 @@ internal class LoadModificationConsequenceNode(
         try {
             this.isFactor = match.groupValues[1].isNotBlank()
             this.loadModifier = match.groupValues[2].toDouble()
-            this.functionType = match.groupValues[4].toString()
-            this.endpointName = match.groupValues[5].toString()
+            this.functionType = match.groupValues[4]
+            this.endpointName = match.groupValues[5]
 
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException("Invalid number format in load modification description string '$data_str'")
@@ -121,12 +121,47 @@ internal class LoadModificationConsequenceNode(
     }
 
     override fun activateConsequence() {
-        triggerManager.trigger(LoadModificationEventData(endpointName, loadModifier, functionType, isFactor, temporalContext))
+        triggerManager.trigger(
+            LoadModificationEventData(
+                endpointName,
+                loadModifier,
+                functionType,
+                isFactor,
+                temporalContext
+            )
+        )
     }
 
     override fun deactivateConsequence() {}
 }
 
+internal class HookEventConsequenceNode(
+    private val data_str: String,
+    triggerManager: TriggerManager,
+    temporalContext: TemporalOperatorInfo
+) : ActivationConsequenceNode(triggerManager, temporalContext) {
+    val name: String
+
+    init {
+        val regex = Regex("event\\[(.+)\\]", RegexOption.IGNORE_CASE)
+        val match = regex.matchEntire(data_str) ?: throw IllegalArgumentException(
+            "Invalid hook event description string '$data_str'.\n" +
+                    "Expected format 'event[<name>]'.\n"
+        )
+        this.name = match.groupValues[1]
+    }
+
+    override fun activateConsequence() {
+        triggerManager.trigger(
+            HookEventData(
+                name,
+                temporalContext
+            )
+        )
+    }
+
+    override fun deactivateConsequence() {}
+}
 
 internal class ValueEventConsequenceNode<T : Any>(
     val targetProperty: String,

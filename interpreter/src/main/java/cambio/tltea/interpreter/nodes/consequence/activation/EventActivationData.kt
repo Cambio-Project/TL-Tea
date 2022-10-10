@@ -12,6 +12,9 @@ class EventPreventionData(eventName: String, temporalContext: TemporalOperatorIn
 class EventActivationData(eventName: String, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(eventName, temporalContext)
 
+class HookEventData(val eventName: String, temporalContext: TemporalOperatorInfo) :
+    ActivationData<String>(eventName, temporalContext)
+
 class ServiceFailureEventData(val serviceName: String, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(serviceName, temporalContext)
 

@@ -33,7 +33,7 @@ internal class ActivationConsequenceNodeFactoryTest {
         assertTrue(expectedType.isInstance(node))
     }
 
-    private fun checkParser(input:String, expectedType: Class<out ActivationConsequenceNode>) {
+    private fun checkParser(input: String, expectedType: Class<out ActivationConsequenceNode>) {
         val interpretationResult = Interpreter.interpretAsBehavior(input)
         assertTrue(expectedType.isInstance(interpretationResult.consequenceDescription.consequenceAST))
     }
@@ -70,6 +70,15 @@ internal class ActivationConsequenceNodeFactoryTest {
         //checkType("stop[service1]", ServiceStartConsequenceNode::class.java, true)
 
         checkParser("F(kill[service1])", ServiceFailureConsequenceNode::class.java)
+    }
+
+    @Test
+    internal fun testParsesHookEvent() {
+        checkFactory("event[test]", HookEventConsequenceNode::class.java)
+        checkFactory("event[test,linear]", HookEventConsequenceNode::class.java)
+        // TODO: inversion currently not implemented
+
+        checkParser("F(event[test])", HookEventConsequenceNode::class.java)
     }
 
     @Test
