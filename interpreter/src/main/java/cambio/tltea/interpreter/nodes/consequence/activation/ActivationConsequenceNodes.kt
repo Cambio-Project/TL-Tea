@@ -2,7 +2,9 @@ package cambio.tltea.interpreter.nodes.consequence.activation
 
 import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.parser.core.OperatorToken
+import cambio.tltea.parser.core.temporal.ITemporalValue
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
+import cambio.tltea.parser.core.temporal.TemporalPropositionParser
 
 
 internal fun extractServiceName(keyword: String, data_str: String): String {
@@ -99,10 +101,11 @@ internal class LoadModificationConsequenceNode(
     val functionType: String
     val loadModifier: Double
     val isFactor: Boolean
+    val duration: ITemporalValue
 
     init {
         //expected format load[x?[+-]<float>[:<type>]:<endpoint name>]
-        val regex = Regex("load\\[(x?)([+-]?[0-9]+|[0-9]*.[0-9]+)(:(.+))?:(.+)]", RegexOption.IGNORE_CASE)
+        val regex = Regex("load(\\[.*])\\[(x?)([+-]?[0-9]+|[0-9]*.[0-9]+)(:(.+))?:(.+)]", RegexOption.IGNORE_CASE)
         val match = regex.matchEntire(data_str) ?: throw IllegalArgumentException(
             "Invalid load modification description string '$data_str'.\n" +
                     "Expected format 'load[x<float>[:<type>]:<endpoint name>]'.\n" +
@@ -110,10 +113,11 @@ internal class LoadModificationConsequenceNode(
         )
 
         try {
-            this.isFactor = match.groupValues[1].isNotBlank()
-            this.loadModifier = match.groupValues[2].toDouble()
-            this.functionType = match.groupValues[4]
-            this.endpointName = match.groupValues[5]
+            this.duration = TemporalPropositionParser.parse(match.groupValues[1])
+            this.isFactor = match.groupValues[2].isNotBlank()
+            this.loadModifier = match.groupValues[3].toDouble()
+            this.functionType = match.groupValues[5]
+            this.endpointName = match.groupValues[6]
 
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException("Invalid number format in load modification description string '$data_str'")
@@ -125,6 +129,7 @@ internal class LoadModificationConsequenceNode(
             LoadModificationEventData(
                 endpointName,
                 loadModifier,
+                duration,
                 functionType,
                 isFactor,
                 temporalContext
@@ -143,7 +148,7 @@ internal class HookEventConsequenceNode(
     val name: String
 
     init {
-        val regex = Regex("event\\[(.+)\\]", RegexOption.IGNORE_CASE)
+        val regex = Regex("event\\[(.+)]", RegexOption.IGNORE_CASE)
         val match = regex.matchEntire(data_str) ?: throw IllegalArgumentException(
             "Invalid hook event description string '$data_str'.\n" +
                     "Expected format 'event[<name>]'.\n"

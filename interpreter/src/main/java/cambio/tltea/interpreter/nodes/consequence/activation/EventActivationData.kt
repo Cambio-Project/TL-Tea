@@ -1,6 +1,7 @@
 package cambio.tltea.interpreter.nodes.consequence.activation
 
 import cambio.tltea.parser.core.OperatorToken
+import cambio.tltea.parser.core.temporal.ITemporalValue
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 import cambio.tltea.parser.mtl.generated.ParseException
 
@@ -25,7 +26,12 @@ class ServiceStopEventData(val serviceName: String, temporalContext: TemporalOpe
     ActivationData<String>(serviceName, temporalContext)
 
 class LoadModificationEventData(
-    val load_str: String, val modificationValue: Double, val functionType: String, val isFactor: Boolean, temporalContext: TemporalOperatorInfo
+    val load_str: String,
+    val modificationValue: Double,
+    val duration: ITemporalValue,
+    val functionType: String,
+    val isFactor: Boolean,
+    temporalContext: TemporalOperatorInfo
 ) : ActivationData<String>(load_str, temporalContext)
 
 

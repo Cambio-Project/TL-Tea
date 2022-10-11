@@ -40,9 +40,9 @@ internal class ActivationConsequenceNodeFactoryTest {
 
     @Test
     internal fun testParsesLoadModification() {
-        checkFactory("load[5:endpoint]", LoadModificationConsequenceNode::class.java)
+        checkFactory("load[1,10][5:endpoint]", LoadModificationConsequenceNode::class.java)
 
-        checkParser("F(load[5:endpoint])", LoadModificationConsequenceNode::class.java)
+        checkParser("F(load[1,10][5:endpoint])", LoadModificationConsequenceNode::class.java)
     }
 
     @Test
