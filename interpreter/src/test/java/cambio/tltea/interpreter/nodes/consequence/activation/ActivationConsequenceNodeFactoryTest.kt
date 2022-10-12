@@ -48,6 +48,7 @@ internal class ActivationConsequenceNodeFactoryTest {
     @Test
     internal fun testParsesServiceStart() {
         checkFactory("start[service1]", ServiceStartConsequenceNode::class.java)
+        checkFactory("start[service1,1]", ServiceStartConsequenceNode::class.java)
         //TODO: start does currently not have an inversion, maybe use "force stop" as event type
         //checkType("start[service1]", ServiceStopConsequenceNode::class.java, true)
 
@@ -57,6 +58,7 @@ internal class ActivationConsequenceNodeFactoryTest {
     @Test
     internal fun testParsesServiceStop() {
         checkFactory("stop[service1]", ServiceStopConsequenceNode::class.java)
+        checkFactory("stop[service1,1]", ServiceStopConsequenceNode::class.java)
         //TODO: stop does currently have no inversion, maybe create "no shutdown" as event type
         //checkType("stop[service1]", ServiceStartConsequenceNode::class.java, true)
 
@@ -66,6 +68,7 @@ internal class ActivationConsequenceNodeFactoryTest {
     @Test
     internal fun testParsesServiceKilled() {
         checkFactory("kill[service1]", ServiceFailureConsequenceNode::class.java)
+        checkFactory("kill[service1,1]", ServiceFailureConsequenceNode::class.java)
         //TODO: kill does currently have no inversion, maybe create "keep alive" as event type
         //checkType("stop[service1]", ServiceStartConsequenceNode::class.java, true)
 

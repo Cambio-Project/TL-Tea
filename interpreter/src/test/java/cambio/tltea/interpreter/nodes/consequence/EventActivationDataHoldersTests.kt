@@ -3,6 +3,7 @@ package cambio.tltea.interpreter.nodes.consequence
 import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.interpreter.nodes.consequence.activation.HookEventConsequenceNode
 import cambio.tltea.interpreter.nodes.consequence.activation.LoadModificationConsequenceNode
+import cambio.tltea.interpreter.nodes.consequence.activation.ServiceFailureConsequenceNode
 import cambio.tltea.parser.core.OperatorToken
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
@@ -13,6 +14,23 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 internal class EventActivationDataHoldersTests {
+
+    @Test
+    internal fun testServiceKillEventDataParse(){
+        val test = {data:String, serviceName:String, instanceCount:Int ->
+            val triggerNotifier = mock(TriggerManager::class.java)
+
+            val eventData = ServiceFailureConsequenceNode(
+                data,
+                triggerNotifier,
+                TemporalOperatorInfo(OperatorToken.GLOBALLY, TemporalInterval(0.0, 10.0))
+            )
+            assertEquals(serviceName, eventData.serviceName)
+            assertEquals(instanceCount, eventData.count)
+        }
+        test("kill[test.endpoint,1]", "test.endpoint", 1)
+        test("kill[test.endpoint]", "test.endpoint", Int.MAX_VALUE)
+    }
 
     @Test
     internal fun testLoadModificationEventDataParse() {

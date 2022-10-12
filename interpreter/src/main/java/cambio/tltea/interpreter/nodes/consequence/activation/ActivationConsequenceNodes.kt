@@ -6,14 +6,6 @@ import cambio.tltea.parser.core.temporal.ITemporalValue
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
 import cambio.tltea.parser.core.temporal.TemporalPropositionParser
 
-
-internal fun extractServiceName(keyword: String, data_str: String): String {
-    val regex = Regex("$keyword\\[(.*)]", RegexOption.IGNORE_CASE)
-    val match = regex.find(data_str)
-        ?: throw IllegalArgumentException("Invalid data string: $data_str. Expected: '$keyword[<service name>]'")
-    return match.groupValues[1]
-}
-
 internal class EventActivationConsequenceNode(
     private val eventName: String,
     triggerManager: TriggerManager,
@@ -50,10 +42,23 @@ internal class ServiceFailureConsequenceNode(
     temporalContext: TemporalOperatorInfo
 ) : ActivationConsequenceNode(triggerManager, temporalContext) {
 
-    val serviceName: String = extractServiceName("kill", data_str)
+    //expected format kill[<service name>,<instance count>]
+    private val regex = Regex("kill\\[([^,]*)(,([0-9]+))?]", RegexOption.IGNORE_CASE)
+    private val match = regex.matchEntire(data_str) ?: throw IllegalArgumentException(
+        "Invalid service failure string '$data_str'.\n" +
+                "Expected format 'kill[<service name>,<instance count>]'."
+    )
+
+    val serviceName: String = match.groupValues[1]
+    private val countString: String = match.groupValues[3]
+    val count: Int = if (!countString.isEmpty()) {
+        countString.toInt()
+    } else {
+        Int.MAX_VALUE
+    }
 
     override fun activateConsequence() {
-        triggerManager.trigger(ServiceFailureEventData(serviceName, temporalContext))
+        triggerManager.trigger(ServiceFailureEventData(serviceName, count, temporalContext))
     }
 
     override fun deactivateConsequence() {}
@@ -65,10 +70,23 @@ internal class ServiceStopConsequenceNode(
     temporalContext: TemporalOperatorInfo
 ) : ActivationConsequenceNode(triggerManager, temporalContext) {
 
-    val serviceName: String = extractServiceName("stop", data_str)
+    //expected format stop[<service name>,<instance count>]
+    private val regex = Regex("stop\\[([^,]*)(,([0-9]+))?]", RegexOption.IGNORE_CASE)
+    private val match = regex.matchEntire(data_str) ?: throw IllegalArgumentException(
+        "Invalid service failure string '$data_str'.\n" +
+                "Expected format 'stop[<service name>,<instance count>]'."
+    )
+
+    val serviceName: String = match.groupValues[1]
+    private val countString: String = match.groupValues[3]
+    val count: Int = if (!countString.isEmpty()) {
+        countString.toInt()
+    } else {
+        Int.MAX_VALUE
+    }
 
     override fun activateConsequence() {
-        triggerManager.trigger(ServiceStopEventData(serviceName, temporalContext))
+        triggerManager.trigger(ServiceStopEventData(serviceName, count, temporalContext))
     }
 
     override fun deactivateConsequence() {}
@@ -81,10 +99,23 @@ internal class ServiceStartConsequenceNode(
     temporalContext: TemporalOperatorInfo
 ) : ActivationConsequenceNode(triggerManager, temporalContext) {
 
-    val serviceName: String = extractServiceName("start", data_str)
+    //expected format start[<service name>,<instance count>]
+    private val regex = Regex("start\\[([^,]*)(,([0-9]+))?]", RegexOption.IGNORE_CASE)
+    private val match = regex.matchEntire(data_str) ?: throw IllegalArgumentException(
+        "Invalid service failure string '$data_str'.\n" +
+                "Expected format 'start[<service name>,<instance count>]'."
+    )
+
+    val serviceName: String = match.groupValues[1]
+    private val countString: String = match.groupValues[3]
+    val count: Int = if (!countString.isEmpty()) {
+        countString.toInt()
+    } else {
+        Int.MAX_VALUE
+    }
 
     override fun activateConsequence() {
-        triggerManager.trigger(ServiceStartEventData(serviceName, temporalContext))
+        triggerManager.trigger(ServiceStartEventData(serviceName, count, temporalContext))
     }
 
     override fun deactivateConsequence() {}

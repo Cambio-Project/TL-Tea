@@ -16,13 +16,13 @@ class EventActivationData(eventName: String, temporalContext: TemporalOperatorIn
 class HookEventData(val eventName: String, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(eventName, temporalContext)
 
-class ServiceFailureEventData(val serviceName: String, temporalContext: TemporalOperatorInfo) :
+class ServiceFailureEventData(val serviceName: String, val count: Int, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(serviceName, temporalContext)
 
-class ServiceStartEventData(val serviceName: String, temporalContext: TemporalOperatorInfo) :
+class ServiceStartEventData(val serviceName: String, val count: Int, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(serviceName, temporalContext)
 
-class ServiceStopEventData(val serviceName: String, temporalContext: TemporalOperatorInfo) :
+class ServiceStopEventData(val serviceName: String, val count: Int, temporalContext: TemporalOperatorInfo) :
     ActivationData<String>(serviceName, temporalContext)
 
 class LoadModificationEventData(
