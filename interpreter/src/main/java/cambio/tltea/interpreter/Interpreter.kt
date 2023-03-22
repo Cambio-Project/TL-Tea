@@ -1,5 +1,6 @@
 package cambio.tltea.interpreter
 
+import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.ConsequenceInterpreter
 import cambio.tltea.parser.core.ASTNode
 import cambio.tltea.parser.mtl.generated.MTLParser
@@ -15,14 +16,14 @@ import java.util.*
  */
 object Interpreter {
 
-    fun interpretAllAsBehavior(mtlLoc: String, isDebugOn: Boolean = false): List<BehaviorInterpretationResult> {
+    fun interpretAllAsBehavior(mtlLoc: String, brokers: Brokers, isDebugOn: Boolean = false): List<BehaviorInterpretationResult> {
         Objects.requireNonNull(mtlLoc)
         try {
             if (!Paths.get(mtlLoc).toFile().exists()) {
                 throw FileNotFoundException("[WARNING] Did not find MTL formula file at $mtlLoc")
             }
             val lines = Files.readAllLines(Paths.get(mtlLoc))
-            return interpretAllAsBehavior(lines, isDebugOn)
+            return interpretAllAsBehavior(lines, brokers, isDebugOn)
         } catch (e: IOException) {
             if (isDebugOn) {
                 e.printStackTrace()
@@ -37,26 +38,29 @@ object Interpreter {
 
     fun interpretAllAsBehavior(
         formulas: Collection<String>,
+        brokers : Brokers,
         isDebugOn: Boolean = false
     ): List<BehaviorInterpretationResult> {
         Objects.requireNonNull(formulas)
         val results = mutableListOf<BehaviorInterpretationResult>()
         for (formula in formulas) {
             val parsed = MTLParser.parse(formula)
-            results.add(interpretAsBehavior(parsed))
+            results.add(interpretAsBehavior(parsed, brokers))
         }
         return results
     }
 
     fun interpretAsBehavior(
-        mlt_formula: String
+        mlt_formula: String,
+        brokers : Brokers
     ): BehaviorInterpretationResult {
-        return interpretAsBehavior(MTLParser.parse(mlt_formula))
+        return interpretAsBehavior(MTLParser.parse(mlt_formula), brokers)
     }
 
-    fun interpretAsBehavior(root: ASTNode): BehaviorInterpretationResult {
+    fun interpretAsBehavior(root: ASTNode, brokers: Brokers): BehaviorInterpretationResult {
         val clone = root.clone()
-        val consequenceDescription = ConsequenceInterpreter().interpretAsMTL(clone)
-        return BehaviorInterpretationResult(clone, consequenceDescription)
+        val consequenceDescription = ConsequenceInterpreter(brokers).interpretAsMTL(clone)
+        return BehaviorInterpretationResult(clone, consequenceDescription, brokers)
     }
+
 }

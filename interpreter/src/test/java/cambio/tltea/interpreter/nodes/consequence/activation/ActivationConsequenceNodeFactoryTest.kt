@@ -1,6 +1,7 @@
 package cambio.tltea.interpreter.nodes.consequence.activation
 
 import cambio.tltea.interpreter.Interpreter
+import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.ActivationConsequenceNodeFactory
 import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
@@ -34,7 +35,7 @@ internal class ActivationConsequenceNodeFactoryTest {
     }
 
     private fun checkParser(input: String, expectedType: Class<out ActivationConsequenceNode>) {
-        val interpretationResult = Interpreter.interpretAsBehavior(input)
+        val interpretationResult = Interpreter.interpretAsBehavior(input, Brokers())
         assertTrue(expectedType.isInstance(interpretationResult.consequenceDescription.consequenceAST))
     }
 

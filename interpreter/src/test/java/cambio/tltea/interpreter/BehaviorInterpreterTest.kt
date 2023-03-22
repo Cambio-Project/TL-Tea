@@ -1,6 +1,7 @@
 package cambio.tltea.interpreter
 
 import cambio.tltea.interpreter.Interpreter.interpretAsBehavior
+import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.cause.EventActivationListener
 import cambio.tltea.parser.core.temporal.TimeInstance
 import cambio.tltea.parser.mtl.generated.MTLParser
@@ -13,7 +14,7 @@ internal class BehaviorInterpreterTest {
     fun debugTest() {
         val input = "((P)&(!!(C))|!(D))->((Q)==1234)"
         val ast = MTLParser(input).parse()
-        val result = interpretAsBehavior(ast)
+        val result = interpretAsBehavior(ast, Brokers())
         result.activateProcessing();
 
 

@@ -1,48 +1,55 @@
-package cambio.tltea.interpreter.nodes.cause;
+package cambio.tltea.interpreter.nodes.cause
 
-import cambio.tltea.interpreter.nodes.StateChangeEvent;
-import cambio.tltea.interpreter.nodes.StateChangedPublisher;
-import cambio.tltea.parser.core.temporal.ITemporalValue;
+import cambio.tltea.interpreter.connector.value.IMetricListener
+import cambio.tltea.interpreter.connector.value.IMetricSubscriber
+import cambio.tltea.interpreter.nodes.StateChangeEvent
+import cambio.tltea.interpreter.nodes.StateChangeListener
+import cambio.tltea.interpreter.nodes.StateChangedPublisher
+import cambio.tltea.parser.core.temporal.ITemporalValue
+import cambio.tltea.parser.core.temporal.TimeInstance
+import java.util.function.Consumer
 
-public class ValueListener<T> extends StateChangedPublisher<T> {
-    private boolean isListening;
-    protected T currentValue;
+open class ValueListener<T : Comparable<T>>(val valueOrEventName: String, @JvmField var currentValue:T) : StateChangedPublisher<T>(), IMetricSubscriber<T> {
+    private var isListening = false
+    var metricListener: IMetricListener<T>? = null
 
-    protected final String valueOrEventName;
-
-    public ValueListener(String valueOrEventName) {
-        this.valueOrEventName = valueOrEventName;
-    }
-
-    protected void changeStateAndNotify(T newValue, ITemporalValue time) {
+    protected fun changeStateAndNotify(newValue: T, time: ITemporalValue?) {
         if (!isListening) {
-            return;
+            return
         }
-        this.currentValue = newValue;
-        subscribers.forEach(listener -> listener.onEvent(new StateChangeEvent<>(this,
-                                                                                newValue,
-                                                                                currentValue,
-                                                                                time)));
+        currentValue = newValue
+        subscribers.forEach(Consumer { listener: StateChangeListener<T?> ->
+            listener.onEvent(
+                StateChangeEvent(
+                    this,
+                    newValue,
+                    currentValue,
+                    time
+                )
+            )
+        })
     }
 
-
-    public void updateValue(T value, ITemporalValue time) {
-        changeStateAndNotify(value, time);
+    fun updateValue(value: T, time: ITemporalValue?) {
+        changeStateAndNotify(value, time)
     }
 
-    public void startListening() {
-        isListening = true;
+    fun startListening() {
+        isListening = true
     }
 
-    public void stopListening() {
-        isListening = false;
+    fun stopListening() {
+        isListening = false
     }
 
-    public String getValueOrEventName() {
-        return valueOrEventName;
+    open fun clone(): ValueListener<T> {
+        val valueListener = ValueListener<T>(valueOrEventName, currentValue)
+        this.metricListener?.subscribe(valueListener)
+        valueListener.metricListener = this.metricListener
+        return valueListener
     }
 
-    public ValueListener<T> clone() {
-        return new ValueListener<>(valueOrEventName);
+    override fun update(value: T, time: TimeInstance) {
+        updateValue(value, time)
     }
 }

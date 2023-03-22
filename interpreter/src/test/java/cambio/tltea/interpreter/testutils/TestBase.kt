@@ -2,6 +2,10 @@ package cambio.tltea.interpreter.testutils
 
 import cambio.tltea.interpreter.BehaviorInterpretationResult
 import cambio.tltea.interpreter.Interpreter
+import cambio.tltea.interpreter.connector.Brokers
+import cambio.tltea.interpreter.connector.value.IMetricListener
+import cambio.tltea.interpreter.connector.value.IMetricRegistrationStrategy
+import cambio.tltea.interpreter.connector.value.MetricDescriptor
 import cambio.tltea.interpreter.nodes.TriggerManager
 import cambio.tltea.interpreter.nodes.cause.EventActivationListener
 import cambio.tltea.interpreter.nodes.consequence.activation.EventActivationData
@@ -11,6 +15,7 @@ import cambio.tltea.parser.core.temporal.ITemporalValue
 import cambio.tltea.parser.core.temporal.TimeInstance
 import cambio.tltea.parser.mtl.generated.MTLParser
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 
 open class TestBase {
 
@@ -21,10 +26,12 @@ open class TestBase {
     protected lateinit var eventPreventionLog: MutableList<String>
     protected lateinit var valueEventActivationLog: MutableList<String>
 
-
     protected fun interpretFormula(formula: String): BehaviorInterpretationResult {
-        val interpretAsBehavior = Interpreter.interpretAsBehavior(MTLParser.parse(formula)
-        )
+        return interpretFormula(formula, Brokers())
+    }
+
+    protected fun interpretFormula(formula: String, brokers: Brokers): BehaviorInterpretationResult {
+        val interpretAsBehavior = Interpreter.interpretAsBehavior(MTLParser.parse(formula), brokers)
 
         currentInterpretationResult = interpretAsBehavior
         triggerManager = interpretAsBehavior.triggerManager

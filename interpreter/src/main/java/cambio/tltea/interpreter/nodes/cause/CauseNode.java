@@ -18,7 +18,9 @@ public abstract class CauseNode extends StateChangedPublisher<Boolean> {
     public abstract Boolean getCurrentValue();
 
     protected final boolean satisfiesTemporalContext(ITemporalValue activationTime) {
-        if (temporalContext.temporalValueExpression() instanceof TemporalInterval interval) {
+        if (temporalContext == null){
+            return true;
+        } else if(temporalContext.temporalValueExpression() instanceof TemporalInterval interval) {
             if (activationTime instanceof TemporalInterval activationInterval) {
                 return interval.contains(activationInterval);
             } else if (activationTime instanceof TimeInstance timeInstance) {

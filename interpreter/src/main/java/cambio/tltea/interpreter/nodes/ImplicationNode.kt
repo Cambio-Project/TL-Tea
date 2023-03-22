@@ -7,8 +7,8 @@ import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
  * @author Lion Wagner
  */
 class ImplicationNode(
-    private val causeDescription: CauseDescription,
-    private val consequence: ConsequenceDescription,
+    val causeDescription: CauseDescription,
+    val consequence: ConsequenceDescription,
     temporalContext: TemporalOperatorInfo,
     triggerManager: TriggerManager
 ) : ConsequenceNode(triggerManager, temporalContext), StateChangeListener<Boolean> {

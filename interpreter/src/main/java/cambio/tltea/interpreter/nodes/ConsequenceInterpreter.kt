@@ -1,5 +1,6 @@
 package cambio.tltea.interpreter.nodes
 
+import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.consequence.AndConsequenceNode
 import cambio.tltea.interpreter.nodes.consequence.ConsequenceNode
 import cambio.tltea.interpreter.nodes.consequence.OrConsequenceNode
@@ -35,7 +36,9 @@ import cambio.tltea.parser.core.temporal.*
 
 //until[x,y] => left is true till right is true
 //Roughly, but not exactly G[x,y](!right -> left)
-class ConsequenceInterpreter() {
+class ConsequenceInterpreter(
+    val brokers: Brokers
+) {
 
     /**
      * @param mtlRoot the root of the parsed MTL formula
@@ -277,8 +280,8 @@ class ConsequenceInterpreter() {
         val left = root.leftChild
         val right = root.rightChild
 
-        val cause = CauseInterpreter().interpretMTLCause(left, temporalContext)
-        val consequence = ConsequenceInterpreter().interpretAsMTL(
+        val cause = CauseInterpreter(brokers).interpretMTLCause(left, temporalContext)
+        val consequence = ConsequenceInterpreter(brokers).interpretAsMTL(
             right,
             consequenceDescription.triggerManager
         )

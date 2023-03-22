@@ -1,5 +1,6 @@
 package cambio.tltea.interpreter
 
+import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.ConsequenceDescription
 import cambio.tltea.interpreter.nodes.ISubscribableTriggerNotifier
 import cambio.tltea.interpreter.nodes.TriggerManager
@@ -13,6 +14,7 @@ import java.util.function.Consumer
 class BehaviorInterpretationResult internal constructor(
     val modifiedAST: ASTNode,
     val consequenceDescription: ConsequenceDescription,
+    val brokers: Brokers,
     val triggerManager: TriggerManager = consequenceDescription.triggerManager
 ) :
     ISubscribableTriggerNotifier {
