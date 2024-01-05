@@ -4,8 +4,10 @@ import java.util.Objects;
 
 public final class TemporalInterval implements ITemporalValue {
 
-    private final double start;
-    private final double end;
+    private final TimeInstance start;
+    private final TimeInstance end;
+    private final double rawStart;
+    private final double rawEnd;
     private final boolean startInclusive;
     private final boolean endInclusive;
 
@@ -18,8 +20,10 @@ public final class TemporalInterval implements ITemporalValue {
     }
 
     public TemporalInterval(double start, double end, boolean startInclusive, boolean endInclusive) {
-        this.start = start;
-        this.end = end;
+        this.start = new TimeInstance(start);
+        this.end = new TimeInstance(end);
+        this.rawStart = start;
+        this.rawEnd = end;
         this.startInclusive = startInclusive && start != Double.NEGATIVE_INFINITY;
         this.endInclusive = endInclusive && end != Double.POSITIVE_INFINITY;
 
@@ -33,12 +37,20 @@ public final class TemporalInterval implements ITemporalValue {
         }
     }
 
-    public Double getStart() {
+    public TimeInstance getStart() {
         return start;
     }
 
-    public Double getEnd() {
+    public TimeInstance getEnd() {
         return end;
+    }
+
+    public Double getStartAsDouble() {
+        return rawStart;
+    }
+
+    public Double getEndAsDouble() {
+        return rawEnd;
     }
 
     public boolean isStartInclusive() {
@@ -51,17 +63,20 @@ public final class TemporalInterval implements ITemporalValue {
 
 
     public boolean contains(double value) {
-        return ((startInclusive && value >= start) ||
-               (!startInclusive && value > start))
+        return ((startInclusive && value >= rawStart) ||
+               (!startInclusive && value > rawStart))
                &&
-               ((endInclusive && value <= end) ||
-               (!endInclusive && value < end));
+               ((endInclusive && value <= rawEnd) ||
+               (!endInclusive && value < rawEnd));
 
     }
 
+    public boolean contains(TimeInstance time){
+        return contains(time.getTime());
+    }
 
     public boolean contains(TemporalInterval interval) {
-        return contains(interval.getStart()) && contains(interval.getEnd());
+        return contains(interval.getStartAsDouble()) && contains(interval.getEndAsDouble());
     }
 
 
@@ -71,8 +86,8 @@ public final class TemporalInterval implements ITemporalValue {
 
 
     public boolean isBefore(TemporalInterval interval) {
-        if (end <= interval.getStart()) {
-            if (end == interval.getStart()) {
+        if (rawEnd <= interval.getStartAsDouble()) {
+            if (rawEnd == interval.getStartAsDouble()) {
                 return !(endInclusive && interval.isStartInclusive());
             }
             return true;
@@ -81,8 +96,8 @@ public final class TemporalInterval implements ITemporalValue {
     }
 
     public boolean isAfter(TemporalInterval interval) {
-        if (start >= interval.getEnd()) {
-            if (start == interval.getEnd()) {
+        if (rawStart >= interval.getEndAsDouble()) {
+            if (rawStart == interval.getEndAsDouble()) {
                 return !(startInclusive && interval.isEndInclusive());
             }
             return true;
@@ -91,7 +106,7 @@ public final class TemporalInterval implements ITemporalValue {
     }
 
     public Double getDuration() {
-        return end - start;
+        return rawEnd - rawStart;
     }
 
     @Override
@@ -103,16 +118,17 @@ public final class TemporalInterval implements ITemporalValue {
             return false;
         }
         TemporalInterval interval = (TemporalInterval) o;
-        return startInclusive == interval.startInclusive && endInclusive == interval.endInclusive && (start == interval.start) && (end == interval.end);
+        return startInclusive == interval.startInclusive && endInclusive == interval.endInclusive && (rawStart
+            == interval.rawStart) && (rawEnd == interval.rawEnd);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(start, end, startInclusive, endInclusive);
+        return Objects.hash(rawStart, rawEnd, startInclusive, endInclusive);
     }
 
     @Override
     public String toString() {
-        return (startInclusive ? "[" : "(") + start + "," + end + (endInclusive ? "]" : ")");
+        return (startInclusive ? "[" : "(") + rawStart + "," + rawEnd + (endInclusive ? "]" : ")");
     }
 }

@@ -8,5 +8,5 @@ interface IMetricRegistrationStrategy {
     /**
      * Registers a [IMetricListener] at the source described by a [MetricDescriptor].
      */
-    fun register(listener: IMetricListener<Double>, descriptor: MetricDescriptor)
+    fun register(listener: IMetricListener<*>, descriptor: MetricDescriptor)
 }

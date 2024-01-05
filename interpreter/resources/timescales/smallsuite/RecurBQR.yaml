@@ -1,0 +1,3 @@
+---
+name : "RecurBQR"
+pattern : "always((q(x) && !r(z) && once r(z)) -> ((once[0,10](p(y) or r(z))) since r(z)))"

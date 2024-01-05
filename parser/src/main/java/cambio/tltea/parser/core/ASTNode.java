@@ -1,6 +1,8 @@
 package cambio.tltea.parser.core;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Lion Wagner
@@ -8,6 +10,7 @@ import java.io.PrintStream;
 public abstract class ASTNode implements Cloneable {
 
     protected OperatorASTNode parent;
+    protected List<ASTNode> children = new ArrayList<>();
 
     protected boolean isBracketed = false;
 
@@ -17,7 +20,6 @@ public abstract class ASTNode implements Cloneable {
     public final OperatorASTNode getParent() {
         return parent;
     }
-
     protected final void setParent(OperatorASTNode parent) {
         this.parent = parent;
     }
@@ -30,6 +32,9 @@ public abstract class ASTNode implements Cloneable {
     }
 
     public abstract int getSize();
+    public final List<ASTNode> getChildren(){
+        return this.children;
+    }
 
     public abstract int getTreeWidth();
 

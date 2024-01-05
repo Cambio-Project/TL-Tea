@@ -1,7 +1,6 @@
 package cambio.tltea.parser.core.temporal;
 
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
@@ -18,8 +17,8 @@ class TemporalIntervalTest {
         double start = (Integer.MAX_VALUE / 2.0) * RANDOM.nextDouble();
         double end = start + start * RANDOM.nextDouble();
         var interval = new TemporalInterval(start, end);
-        assertEquals(start, interval.getStart());
-        assertEquals(end, interval.getEnd());
+        assertEquals(start, interval.getStartAsDouble());
+        assertEquals(end, interval.getEndAsDouble());
     }
 
     @RepeatedTest(repetitions)

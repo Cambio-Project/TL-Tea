@@ -1,0 +1,3 @@
+---
+name : "AbsentBR"
+pattern : "always((once[0,10](r(y))) -> ((not p(x)) since r(y)))"

@@ -1,0 +1,3 @@
+---
+name : "AlwaysAQ"
+pattern : "always(  q(y) -> always[0,10]((p(x)))  )"

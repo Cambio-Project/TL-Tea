@@ -58,8 +58,8 @@ class TemporalPropositionParserTest {
         ITemporalValue result = TemporalPropositionParser.parse(input);
         assertTrue(result instanceof TemporalInterval);
         TemporalInterval interval = (TemporalInterval) result;
-        assertEquals(expectedStart, interval.getStart());
-        assertEquals(expectedEnd, interval.getEnd());
+        assertEquals(expectedStart, interval.getStartAsDouble());
+        assertEquals(expectedEnd, interval.getEndAsDouble());
         assertEquals(expectedStartInclusive, interval.isStartInclusive());
         assertEquals(expectedEndInclusive, interval.isEndInclusive());
     }

@@ -7,7 +7,6 @@ import cambio.tltea.parser.core.temporal.TemporalOperatorInfo;
  * @author Lion Wagner
  */
 public class BinaryOperationASTNode extends OperatorASTNode {
-
     protected ASTNode left;
     protected ASTNode right;
     protected final int operatorPriority;
@@ -20,6 +19,8 @@ public class BinaryOperationASTNode extends OperatorASTNode {
         super(operatorImage);
         this.left = left;
         this.right = right;
+        this.children.add(left);
+        this.children.add(right);
 
         if (left != null) {
             this.left.setParent(this);
@@ -39,7 +40,6 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     /**
      * Handels the reading of the next operator and node und placing it in the AST below or even with this node.
      *
-     * @param operatorImage
      * @param leftNode
      * @return the updated root node of this (sub-)tree
      */
@@ -79,9 +79,9 @@ public class BinaryOperationASTNode extends OperatorASTNode {
     @Override
     public String toString() {
         return "BinaryOperatorTreeNode{" +
-               "op=" + operator + " ; " +
-               "size=" + getSize() +
-               '}';
+            "op=" + operator + " ; " +
+            "size=" + getSize() +
+            '}';
     }
 
     @Override

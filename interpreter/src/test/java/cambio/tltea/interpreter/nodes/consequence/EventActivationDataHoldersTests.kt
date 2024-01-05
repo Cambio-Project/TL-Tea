@@ -49,8 +49,8 @@ internal class EventActivationDataHoldersTests {
                 assertEquals(loadModifier, eventData.loadModifier)
                 assertEquals(endpointName, eventData.endpointName)
                 assertTrue(eventData.duration is TemporalInterval)
-                assertEquals(start, eventData.duration.start)
-                assertEquals(end, eventData.duration.end)
+                assertEquals(start, eventData.duration.startAsDouble)
+                assertEquals(end, eventData.duration.endAsDouble)
 
             }
         test("load[0,10][x3:test.endpoint]", "test.endpoint", "", true, 3.0, 0.0, 10.0)

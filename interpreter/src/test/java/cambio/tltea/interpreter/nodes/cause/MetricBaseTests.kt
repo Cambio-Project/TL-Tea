@@ -19,15 +19,17 @@ class MetricBaseTests : TestBase() {
     lateinit var brokers: Brokers
 
     class MetricRegistrationStrategy : IMetricRegistrationStrategy {
-        lateinit var a : IMetricListener<Double>
-        lateinit var b : IMetricListener<Double>
+        lateinit var a: IMetricListener<Double>
+        lateinit var b: IMetricListener<Double>
 
-        override fun register(listener: IMetricListener<Double>, descriptor: MetricDescriptor) {
-            if(descriptor.architectureIdentifier == "service1" && descriptor.metricIdentifier == "a"){
+        override fun register(listener: IMetricListener<*>, descriptor: MetricDescriptor) {
+            listener as IMetricListener<Double>
+            
+            if (descriptor.architectureIdentifier == "service1" && descriptor.metricIdentifier == "a") {
                 a = listener
                 return
             }
-            if(descriptor.architectureIdentifier == "service2" && descriptor.metricIdentifier == "b"){
+            if (descriptor.architectureIdentifier == "service2" && descriptor.metricIdentifier == "b") {
                 b = listener
                 return
             }
@@ -36,20 +38,21 @@ class MetricBaseTests : TestBase() {
     }
 
     @BeforeEach
-    fun registerStrategy(){
+    fun registerStrategy() {
         brokers = Brokers()
         strategy = MetricRegistrationStrategy()
         brokers.metricBroker.listenerFactory.registrationStrategy = strategy
     }
 
     @Test
-    fun updateResultOnValueUpdates(){
-        val result : BehaviorInterpretationResult  = interpretFormula("((service1\$a) < (service2\$b)) -> (event:test)", brokers)
+    fun updateResultOnValueUpdates() {
+        val result: BehaviorInterpretationResult =
+            interpretFormula("((service1\$a) < (service2\$b)) -> (event:test)", brokers)
         assertEquals(brokers.metricBroker.listenerFactory.registrationStrategy, strategy)
         assertNotNull(strategy.a)
         assertNotNull(strategy.b)
 
-        val node : ConsequenceNode = result.consequenceDescription.consequenceAST!!
+        val node: ConsequenceNode = result.consequenceDescription.consequenceAST!!
         (node as ImplicationNode)
 
         strategy.a.update(1.0, TimeInstance(0))

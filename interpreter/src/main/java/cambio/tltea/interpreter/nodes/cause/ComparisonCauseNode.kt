@@ -1,22 +1,22 @@
 package cambio.tltea.interpreter.nodes.cause
 
-import cambio.tltea.interpreter.connector.value.predicates.IBiOperatorPredicate
-import cambio.tltea.interpreter.connector.value.predicates.PrimitivePredicate.*
+import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.StateChangeEvent
+import cambio.tltea.interpreter.nodes.logic.relational.*
 import cambio.tltea.parser.core.OperatorToken
 import cambio.tltea.parser.core.temporal.TemporalOperatorInfo
-import java.util.*
+import java.util.Objects
 
 /**
- * @author Lion Wagner
+ * @author Lion Wagner, Sebastian Frank
  */
-class ComparisonCauseNode<T:Comparable<T>>(
+class ComparisonCauseNode<T : Comparable<T>>(
     operator: OperatorToken,
     temporalContext: TemporalOperatorInfo?,
     private val left: ValueListener<T>,
     private val right: ValueListener<T>
 ) : CauseNode(temporalContext) {
-    private val predicate: IBiOperatorPredicate<T>
+    private val predicate: IRelationalNodeLogic<T>
     private var lastValue = false
 
     init {
@@ -35,35 +35,10 @@ class ComparisonCauseNode<T:Comparable<T>>(
         }
     }
 
-    private fun initializePredicate(operator: OperatorToken): IBiOperatorPredicate<T> {
+    private fun initializePredicate(operator: OperatorToken): IRelationalNodeLogic<T> {
         require(OperatorToken.ComparisonOperatorTokens.contains(operator)) { "Operator not supported as comparison: $operator" }
-        return when (operator) {
-            OperatorToken.EQ -> {
-                EQPredicate()
-            }
-
-            OperatorToken.NEQ -> {
-                NEQPredicate()
-            }
-
-            OperatorToken.GT -> {
-                GTPredicate()
-            }
-
-            OperatorToken.GEQ -> {
-                GEQPredicate()
-            }
-
-            OperatorToken.LT -> {
-                LTPredicate()
-            }
-
-            OperatorToken.LEQ -> {
-                LEQPredicate()
-            }
-
-            else -> throw IllegalStateException("Operator not supported as comparison: $operator")
-        }
+        val mapper = OperatorToRelationalLogicMapper<T>(Brokers()) // TODO: pass brokers
+        return mapper.map(operator)
     }
 
     override fun getCurrentValue(): Boolean {
@@ -77,6 +52,6 @@ class ComparisonCauseNode<T:Comparable<T>>(
         Objects.requireNonNull(val1)
         Objects.requireNonNull(val2)
 
-        return predicate.setLeftValue(val1).setRightValue(val2).evaluate()
+        return (predicate.setLeftValue(val1).setRightValue(val2) as AbstractRelationalLogic).evaluate()
     }
 }

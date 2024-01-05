@@ -12,12 +12,14 @@ public class UnaryOperationASTNode extends OperatorASTNode {
     public UnaryOperationASTNode(@NotNull OperatorToken operator, ASTNode child) {
         super(operator);
         this.child = child;
+        this.children.add(child);
         child.setParent(this);
     }
 
     public UnaryOperationASTNode(String operator, ASTNode child) {
         super(operator);
         this.child = child;
+        this.children.add(child);
         child.setParent(this);
     }
 
