@@ -3,8 +3,7 @@ package cambio.tltea.interpreter.nodes.logic.relational
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.events.*
 import cambio.tltea.interpreter.nodes.logic.AbstractLogic
-import cambio.tltea.interpreter.nodes.logic.bool.SatisfactionState
-import cambio.tltea.interpreter.nodes.structure.INode
+import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
 import cambio.tltea.parser.core.temporal.TimeInstance
 
 sealed class AbstractRelationalLogic<T : Comparable<T>>(
@@ -76,7 +75,11 @@ sealed class AbstractRelationalLogic<T : Comparable<T>>(
     }
      */
 
-    override fun evaluate(at: TimeInstance) {
+    override fun forceEvaluate(at: TimeInstance) {
+        receivedUpdate = true
+    }
+
+    override fun evaluate(changePoint: TimeEvent) {
         receivedUpdate = true
     }
 
@@ -85,12 +88,14 @@ sealed class AbstractRelationalLogic<T : Comparable<T>>(
     private fun updateCurrentValue(time:TimeInstance) {
         //satisfactionState.currentTempSatisfied = evaluate()
         val state: Boolean = evaluate()
+        satisfactionState.add(TimeEvent(time, state))
+        /* TODO: remove
         if (state) {
             satisfactionState.addStartEvent(time)
 
         } else {
             satisfactionState.addEndEvent(time)
-        }
+        }*/
     }
 
     /*

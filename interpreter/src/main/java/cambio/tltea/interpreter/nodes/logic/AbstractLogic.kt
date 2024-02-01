@@ -2,10 +2,11 @@ package cambio.tltea.interpreter.nodes.logic
 
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.events.*
-import cambio.tltea.interpreter.nodes.logic.temporal.TimeEventLog
+import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
+import cambio.tltea.interpreter.nodes.logic.util.TimeEventLog
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.temporal.TimeInstance
-import java.util.*
+import kotlin.collections.HashSet
 
 abstract class AbstractLogic(
     protected val brokers: Brokers
@@ -87,21 +88,23 @@ abstract class AbstractLogic(
             evaluate(time)
         }
         */
-        val changePoints: TreeSet<TimeInstance> = TreeSet()
-        changePoints.add(to) // force update at the end
+        val changePoints: HashSet<TimeEvent> = HashSet()
         for (child in node.getChildren()) {
             val changes = child.getNodeLogic().getStateChanges(from, to)
             for (change in changes) {
-                changePoints.add(change.time)
+                changePoints.add(change)
             }
         }
 
-        for (time in changePoints.sorted()) {
-            evaluate(time)
+        for (change in changePoints.sorted()) {
+            evaluate(change)
         }
+        //evaluate force update at the end
+        forceEvaluate(to)
     }
 
-    protected abstract fun evaluate(at: TimeInstance)
+    protected abstract fun evaluate(at: TimeEvent)
+    protected abstract fun forceEvaluate(at: TimeInstance)
 
     private fun on(event: StateChangeNodeEvent) {
         val until = getSmallestChildUpdateTime(event.getTime())
@@ -124,14 +127,14 @@ abstract class AbstractLogic(
     }
 
     protected open fun publishUpdates(fromTime: TimeInstance, toTime: TimeInstance) {
-        val updatesToPublish = satisfactionState.findRangeTimeInstances(fromTime, toTime)
-        for (update in updatesToPublish) {
-            val delayed = (update.start && !update.including) || (!update.start && update.including)
+        val eventsToPublish = satisfactionState.findTimeInstanceMarkers(fromTime, toTime)
+        for (event in eventsToPublish) {
+            val delayed = event.time.isPlusEpsilon
             node.getParent()?.handle(
                 StateChangeNodeEvent(
                     node,
                     delayed,
-                    update.time
+                    event.time
                 )
             )//update.start, !update.start, delayed, update.time))
         }
@@ -153,11 +156,12 @@ abstract class AbstractLogic(
         return time
     }
 
-    override fun getStateChanges(from: TimeInstance, to: TimeInstance): List<TimeEventLog.RangeTimeInstance> {
-        return satisfactionState.findRangeTimeInstances(from, to)
+    // including
+    override fun getStateChanges(from: TimeInstance, to: TimeInstance): List<TimeEvent> {
+        return satisfactionState.findTimeInstanceMarkers(from, to)
     }
 
-    override fun getStateChange(at: TimeInstance): TimeEventLog.RangeTimeInstance? {
+    override fun getStateChange(at: TimeInstance): TimeEvent? {
         return satisfactionState.findRangeTimeInstance(at)
     }
 

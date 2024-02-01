@@ -3,7 +3,7 @@ package cambio.tltea.interpreter.nodes.logic.temporal
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.events.EndOfExperimentNodeEvent
 import cambio.tltea.interpreter.nodes.events.InitializeNodeEvent
-import cambio.tltea.interpreter.nodes.events.StateChangeNodeEvent
+import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
 
@@ -36,13 +36,12 @@ class AlwaysTemporalLogic(
         }
     }
     */
-
-    public override fun evaluate(at: TimeInstance) {
-        val stateChange = this.node.getChildren()[0].getNodeLogic().getStateChange(at) ?: return
-        if (stateChange.start) {
-            onChildSatisfied(at)
+    public override fun evaluate(stateChange: TimeEvent) {
+        val time = stateChange.time
+        if (stateChange.value) {
+            onChildSatisfied(time)
         } else {
-            onChildUnsatisfied(at)
+            onChildUnsatisfied(time)
         }
     }
 
@@ -59,7 +58,9 @@ class AlwaysTemporalLogic(
 
     private fun onEndInfinityDuration(time: TimeInstance) {
         val startTime = activeSince.subtract(temporalInterval.start)
-        satisfactionState.addStartEvent(startTime)
+        val startEvent = TimeEvent.start(startTime)
+        satisfactionState.add(startEvent)
+    //satisfactionState.addStartEvent(startTime) TODO: remove
     }
 
     private fun isLongActive(time: TimeInstance): Boolean {
@@ -70,14 +71,18 @@ class AlwaysTemporalLogic(
         if (!longActive && isLongActive(time)) {
             longActive = true
             val startTime = activeSince.subtract(temporalInterval.start)
-            satisfactionState.addStartEvent(startTime)
+            val startEvent = TimeEvent.start(startTime)
+            satisfactionState.add(startEvent)
+            // satisfactionState.addStartEvent(startTime) TODO: remove
         }
     }
 
     private fun handleEndEvent(time: TimeInstance) {
         if (longActive) {
             val endTime = time.subtract(temporalInterval.end)
-            satisfactionState.addEndEvent(endTime)
+            val endEvent = TimeEvent.end(endTime)
+            satisfactionState.add(endEvent)
+            // satisfactionState.addEndEvent(endTime) TODO: remove
         }
     }
 

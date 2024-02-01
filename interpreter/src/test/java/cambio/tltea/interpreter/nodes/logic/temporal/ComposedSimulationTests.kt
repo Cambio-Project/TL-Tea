@@ -34,6 +34,8 @@ class ComposedSimulationTests : SimulationTest() {
         assertStateEquals(true, 4.0)
     }
 
+
+
     @Test
     fun basicUntimedEventuallyTemp() {
         val formula = "(F((\$A) < (\$B)))"

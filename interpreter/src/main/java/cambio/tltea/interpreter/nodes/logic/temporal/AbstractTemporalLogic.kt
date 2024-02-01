@@ -3,6 +3,7 @@ package cambio.tltea.interpreter.nodes.logic.temporal
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.events.*
 import cambio.tltea.interpreter.nodes.logic.AbstractLogic
+import cambio.tltea.interpreter.nodes.logic.util.TimeEventLog
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
@@ -23,17 +24,18 @@ sealed class AbstractTemporalLogic(
         // do nothing
     }
 
+    final override fun on(event: EndOfRoundNodeEvent) {
+        // do nothing
+    }
+
     override fun on(event: EndOfExperimentNodeEvent) {
-        handleEndOfRound()
+        //handleEndOfRound()
+        on(EndOfRoundNodeEvent(event.getTime()))
         updateCurrentTime(event.getTime())
     //publishUpdates(event.getTime())
     }
 
-    override fun on(event: EndOfRoundNodeEvent) {
-        handleEndOfRound()
-    }
-
-    private fun handleEndOfRound() {
+    final override fun forceEvaluate(at: TimeInstance) {
         // do nothing
     }
 }

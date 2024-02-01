@@ -3,10 +3,11 @@ package cambio.tltea.interpreter.nodes.logic.temporal
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.events.*
 import cambio.tltea.interpreter.nodes.logic.ILogic
+import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
+import cambio.tltea.interpreter.nodes.logic.util.TimeEventLog
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
-import kotlin.math.min
 
 class WeakUntilTemporalLogic(
     temporalInterval: TemporalInterval = TemporalInterval(0.0, Double.POSITIVE_INFINITY), brokers: Brokers
@@ -40,14 +41,15 @@ class WeakUntilTemporalLogic(
         getAlwaysOperator().on(event)
         val initializeTime = TimeInstance(0)
         if (getUntilOperator().getState(initializeTime) || getAlwaysOperator().getState(initializeTime)) {
-            satisfactionState.addStartEvent(initializeTime)
+            satisfactionState.add(TimeEvent.start(initializeTime))
+            // satisfactionState.addStartEvent(initializeTime) TODO: remove
         }
     }
 
+    /*
     override fun on(event: EndOfRoundNodeEvent) {
         getAlwaysOperator().handle(event)
         getUntilOperator().handle(event)
-        super.on(event)
         val time = event.getTime()//this.getCurrentTime()
 
         if (!time.subtractOverflow(temporalInterval.end)) {
@@ -57,6 +59,7 @@ class WeakUntilTemporalLogic(
         }
 
     }
+*/
 
     override fun on(event: EndOfExperimentNodeEvent) {
         getUntilOperator().handle(event)
@@ -72,14 +75,30 @@ class WeakUntilTemporalLogic(
     }
     */
 
-    override fun evaluate(at: TimeInstance) {
-        getUntilOperator().evaluate(at)
-        getAlwaysOperator().evaluate(at)
+    override fun evaluate(stateChange: TimeEvent) {
+        val time = stateChange.time//this.getCurrentTime()
+
+        getUntilOperator().evaluate(stateChange)
+        // For always: only evaluate changes on first part
+        val stateChangeCondition = this.node.getChildren()[0].getNodeLogic().getStateChange(time)
+        if (stateChangeCondition != null) {
+            getAlwaysOperator().evaluate(stateChangeCondition)
+        }
+
+        // Does nothing
+        //getAlwaysOperator().handle(event)
+        //getUntilOperator().handle(event)
+
+        if (!time.subtractOverflow(temporalInterval.end)) {
+            val updateUntil = time.subtract(temporalInterval.end)
+            updateCurrentTime(updateUntil)
+            //publishUpdates(updateUntil)
+        }
     }
 
     override fun handle(event: INodeEvent) {
         if (event is StateChangeNodeEvent) {
-            val stateChanges: List<TimeEventLog.RangeTimeInstance>
+            val stateChanges: List<TimeEvent>
             if (activeEventLog == untilOperatorEvents) {
                 stateChanges = untilOperator.getStateChanges(lastUntilUpdate, event.getTime())
                 lastUntilUpdate = event.getTime()
@@ -88,11 +107,15 @@ class WeakUntilTemporalLogic(
                 lastAlwaysUpdate = event.getTime()
             }
             for (stateChange in stateChanges) {
-                if (stateChange.start) {
+                activeEventLog.add(stateChange)
+                /*
+                if (stateChange.value) {
                     activeEventLog.addStartEvent(stateChange.time, !stateChange.isDelayed())
                 } else {
                     activeEventLog.addEndEvent(stateChange.time, stateChange.isDelayed())
                 }
+                */
+
             }
 
 
@@ -113,9 +136,9 @@ class WeakUntilTemporalLogic(
     override fun updateCurrentTime(time: TimeInstance) {
         val alwaysTime = alwaysOperator.getCurrentTime()
         val untilTime = untilOperator.getCurrentTime()
-        val timeToUpdateTo = if(alwaysTime > untilTime){
+        val timeToUpdateTo = if (alwaysTime > untilTime) {
             untilTime
-        }else{
+        } else {
             alwaysTime
         }
         updateSatisfactionState(lastUpdateTime, timeToUpdateTo)
@@ -133,20 +156,22 @@ class WeakUntilTemporalLogic(
     */
 
     private fun updateSatisfactionState(fromTime: TimeInstance, toTime: TimeInstance) {
-        val happenedEvents = ArrayList<TimeEventLog.RangeTimeInstance>()
-        happenedEvents.addAll(alwaysOperatorEvents.findRangeTimeInstances(fromTime, toTime))
-        happenedEvents.addAll(untilOperatorEvents.findRangeTimeInstances(fromTime, toTime))
+        val happenedEvents = ArrayList<TimeEvent>()
+        happenedEvents.addAll(alwaysOperatorEvents.findTimeInstanceMarkers(fromTime, toTime))
+        happenedEvents.addAll(untilOperatorEvents.findTimeInstanceMarkers(fromTime, toTime))
         happenedEvents.sort()
         for (event in happenedEvents) {
-            if (event.start) {
-                satisfactionState.addStartEvent(event.time, event.including)
+            if (event.value) {
+                satisfactionState.add(event)
+                // satisfactionState.addStartEvent(event.time, event.including) TODO: remove
             } else {
                 // TODO: consider including properly
                 if ((untilOperatorEvents.contains(event) && !alwaysOperatorEvents.evaluate(event.time)) || (alwaysOperatorEvents.contains(
                         event
                     ) && !untilOperatorEvents.evaluate(event.time))
                 ) {
-                    satisfactionState.addEndEvent(event.time, event.including)
+                    satisfactionState.add(event)
+                    // satisfactionState.addEndEvent(event.time, event.including) TODO: remove
                 }
             }
         }

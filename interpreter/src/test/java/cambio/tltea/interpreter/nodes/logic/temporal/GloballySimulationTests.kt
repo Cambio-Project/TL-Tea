@@ -280,5 +280,4 @@ class GloballySimulationTests : SimulationTest() {
         assertStateEquals(true, 5.0)
         assertStateEquals(true, 6.0)
     }
-
 }

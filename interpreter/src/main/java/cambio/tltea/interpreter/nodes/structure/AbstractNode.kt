@@ -30,9 +30,6 @@ sealed class AbstractNode<T, U>(private val parent: INode<Boolean, Boolean>?, pr
     }
 
     final override fun handle(event: INodeEvent) {
-        println("") // TODO: remove
-        println(this.logic.javaClass.simpleName + " --> Node received event") // TODO: remove
-        println(event.getTime().time.toString() + " - " + event.javaClass.simpleName) // TODO: remove
         when (event) {
             is IStructuralNodeEvent -> handle(event)
             is ILogicalNodeEvent -> handle(event)

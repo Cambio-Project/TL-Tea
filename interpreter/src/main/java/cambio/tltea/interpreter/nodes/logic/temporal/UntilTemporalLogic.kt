@@ -1,9 +1,8 @@
 package cambio.tltea.interpreter.nodes.logic.temporal
 
 import cambio.tltea.interpreter.connector.Brokers
-import cambio.tltea.interpreter.nodes.events.EndOfRoundNodeEvent
 import cambio.tltea.interpreter.nodes.events.InitializeNodeEvent
-import cambio.tltea.interpreter.nodes.events.StateChangeNodeEvent
+import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
@@ -42,8 +41,9 @@ class UntilTemporalLogic(
         conditionActiveSince = tempConditionActiveSince
     }
 
+    /*
     override fun on(event: EndOfRoundNodeEvent) {
-        val time = event.getTime()//this.getCurrentTime()
+        val time = this.getCurrentTime()//event.getTime()
         prepareEndOfRound(time)
 
         if (!time.subtractOverflow(temporalInterval.end)) {
@@ -51,8 +51,7 @@ class UntilTemporalLogic(
             //publishUpdates(updateUntil)
             updateCurrentTime(updateUntil)
         }
-        super.on(event)
-    }
+    }*/
 
     private fun prepareEndOfRound(time: TimeInstance) {
         val conditionActiveChanged = tempConditionActive != conditionActive
@@ -83,7 +82,8 @@ class UntilTemporalLogic(
 
         if (conditionActive && releaseActive && !oldConditionLongActive && conditionLongActive) {
             val startTime = conditionActiveSince.add(temporalInterval.start)
-            satisfactionState.addStartEvent(startTime)
+            satisfactionState.add(TimeEvent.start(startTime))
+            //satisfactionState.addStartEvent(startTime) TODO: remove
         }
     }
 
@@ -105,19 +105,27 @@ class UntilTemporalLogic(
 
     }*/
 
-    public override fun evaluate(at: TimeInstance) {
-        val stateChangeRelease = this.node.getChildren()[1].getNodeLogic().getStateChange(at)
+    public override fun evaluate(stateChange: TimeEvent) {
+        val time = stateChange.time
+        val stateChangeRelease = this.node.getChildren()[1].getNodeLogic().getStateChange(time)
         if (stateChangeRelease != null) {
             onReleaseChanged(stateChangeRelease)
         }
-        val stateChangeCondition = this.node.getChildren()[0].getNodeLogic().getStateChange(at)
+        val stateChangeCondition = this.node.getChildren()[0].getNodeLogic().getStateChange(time)
         if (stateChangeCondition != null) {
             onConditionChanged(stateChangeCondition)
         }
+
+        prepareEndOfRound(time)
+        if (!time.subtractOverflow(temporalInterval.end)) {
+            val updateUntil = time.subtract(temporalInterval.end)
+            //publishUpdates(updateUntil)
+            updateCurrentTime(updateUntil)
+        }
     }
 
-    private fun onConditionChanged(stateChange: TimeEventLog.RangeTimeInstance) {
-        if (stateChange.start) {
+    private fun onConditionChanged(stateChange: TimeEvent) {
+        if (stateChange.value) {
             setConditionActive(stateChange.time)
         } else {
             setConditionInactive()
@@ -139,7 +147,8 @@ class UntilTemporalLogic(
     private fun onConditionUnsatisfied(time: TimeInstance, conditionActiveChanged: Boolean) {
         if (releaseActive && (conditionActive || conditionActiveChanged) && conditionLongActive) {
             val endTime = time.subtract(temporalInterval.start)
-            satisfactionState.addEndEvent(endTime, true)
+            satisfactionState.add(TimeEvent.end(TimeInstance(endTime, true)))
+            // satisfactionState.addEndEvent(endTime, true) TODO: remove
         }
     }
 
@@ -172,8 +181,8 @@ class UntilTemporalLogic(
         tempConditionActive = false
     }
 
-    private fun onReleaseChanged(stateChange: TimeEventLog.RangeTimeInstance) {
-        if (stateChange.start) {
+    private fun onReleaseChanged(stateChange: TimeEvent) {
+        if (stateChange.value) {
             setReleaseActive()
         } else {
             setReleaseInactive()
@@ -200,15 +209,22 @@ class UntilTemporalLogic(
         } else {
             return
         }
-        satisfactionState.addStartEvent(startTime)
+
+        val startTimeEvent = TimeEvent.start(startTime)
+        val maxEndTime = time.subtract(temporalInterval.start)
+        satisfactionState.deleteEvent(startTime, maxEndTime, false)
+        satisfactionState.add(startTimeEvent)
+        // satisfactionState.addStartEvent(startTime) TODO: remove
     }
 
     private fun onReleaseUnsatisfied(time: TimeInstance, conditionActiveChanged: Boolean) {
         if ((conditionActive || conditionActiveChanged) && conditionLongActive) {
             val endTime = time.subtract(temporalInterval.start)
-            satisfactionState.addEndEvent(endTime)
+            satisfactionState.delayEvent(endTime, false)
+            //satisfactionState.addEndEvent(endTime)
         } else if (temporalInterval.start.time == 0.0) {
-            satisfactionState.addEndEvent(time)
+            satisfactionState.delayEvent(time, false)
+            //satisfactionState.addEndEvent(time)
         }
 
     }

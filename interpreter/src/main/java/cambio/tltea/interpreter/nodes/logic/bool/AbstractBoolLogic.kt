@@ -3,9 +3,8 @@ package cambio.tltea.interpreter.nodes.logic.bool
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.events.*
 import cambio.tltea.interpreter.nodes.logic.AbstractLogic
-import cambio.tltea.interpreter.nodes.structure.INode
+import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
 import cambio.tltea.parser.core.temporal.TimeInstance
-import java.util.TreeSet
 
 sealed class AbstractBoolLogic(
     private val expectedChildCount: Int,
@@ -35,6 +34,8 @@ sealed class AbstractBoolLogic(
 
     override fun on(event: EndOfExperimentNodeEvent) {
         onEndOfRound()
+        on(EndOfRoundNodeEvent(event.getTime()))
+        updateCurrentTime(event.getTime())
     }
 
     override fun on(event: EndOfRoundNodeEvent) {
@@ -46,11 +47,13 @@ sealed class AbstractBoolLogic(
     }
 
     protected fun updateState(state: Boolean, time: TimeInstance) {
+        satisfactionState.add(TimeEvent(time, state))
+        /* TODO: remove
         if (state) {
             satisfactionState.addStartEvent(time)
         } else {
             satisfactionState.addEndEvent(time)
-        }
+        }*/
     }
 
     override fun on(event: InitializeNodeEvent) {
@@ -59,9 +62,13 @@ sealed class AbstractBoolLogic(
         evaluateBool(event.getTime())
     }
 
-    final override fun evaluate(at: TimeInstance) {
+    final override fun forceEvaluate(at: TimeInstance) {
         evaluateBool(at)
         updateCurrentTime(at)
+    }
+
+    final override fun evaluate(stateChange: TimeEvent) {
+        forceEvaluate(stateChange.time)
     }
 
     abstract fun evaluateBool(at: TimeInstance)

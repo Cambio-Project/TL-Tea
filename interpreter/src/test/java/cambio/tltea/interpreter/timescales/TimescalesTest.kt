@@ -50,12 +50,17 @@ abstract class TimescalesTest : SimulationTest() {
     }
 
     private fun simulateScenario() {
-        for (currentMonitoringData in monitoringData.reversed()) {
+        var timeIndex = 0;
+        for (currentMonitoringData in monitoringData) {
+            val time = TimeInstance(timeIndex)
             for (i: Int in 1..metrics.size) {
-                val time = TimeInstance(i - 1)
                 simulator.forceHandle(time, metrics[i - 1], currentMonitoringData[i].toBoolean())
             }
+            if(timeIndex == 11){
+                println("stop")
+            }
             simulator.forceEndRound()
+            timeIndex++
         }
     }
 

@@ -74,6 +74,7 @@ class EventuallySimulationTests : SimulationTest() {
         assertStateEquals(true, 0.0)
         assertStateEquals(true, 2.0)
         assertStateEquals(true, 3.0)
+        assertStateEquals(true, 3.4)
         assertStateEquals(false, 3.5)
         assertStateEquals(false, 4.0)
     }
@@ -196,41 +197,41 @@ class EventuallySimulationTests : SimulationTest() {
         assertStateEquals(false, 7.0)
     }
 
-@Test
-fun basicTimedEventually5() {
-    val formula = "(F[0,4]((\$A) < (\$B)))"
-    load(formula)
+    @Test
+    fun basicTimedEventually5() {
+        val formula = "(F[0,4]((\$A) < (\$B)))"
+        load(formula)
 
-    val metricA = MetricDescriptor("", "A")
-    val metricB = MetricDescriptor("", "B")
+        val metricA = MetricDescriptor("", "A")
+        val metricB = MetricDescriptor("", "B")
 
-    // F (false)
-    simulator.forceHandle(TimeInstance(0), metricA, 6.0)
-    simulator.forceHandle(TimeInstance(0), metricB, 5.0)
-    simulator.forceEndRound()
+        // F (false)
+        simulator.forceHandle(TimeInstance(0), metricA, 6.0)
+        simulator.forceHandle(TimeInstance(0), metricB, 5.0)
+        simulator.forceEndRound()
 
-    // F (false)
-    simulator.forceHandle(TimeInstance(2), metricA, 5.0)
-    simulator.forceHandle(TimeInstance(2), metricB, 4.0)
-    simulator.forceEndRound()
+        // F (false)
+        simulator.forceHandle(TimeInstance(2), metricA, 5.0)
+        simulator.forceHandle(TimeInstance(2), metricB, 4.0)
+        simulator.forceEndRound()
 
-    // F (true)
-    simulator.forceHandle(TimeInstance(5), metricA, 2.0)
-    simulator.forceEndRound()
+        // F (true)
+        simulator.forceHandle(TimeInstance(5), metricA, 2.0)
+        simulator.forceEndRound()
 
-    // F (false)
-    simulator.forceHandle(TimeInstance(5.5), metricA, 5.0)
-    simulator.forceEndRound()
+        // F (false)
+        simulator.forceHandle(TimeInstance(5.5), metricA, 5.0)
+        simulator.forceEndRound()
 
-    simulator.forceEndExperiment(TimeInstance(6))
+        simulator.forceEndExperiment(TimeInstance(6))
 
-    assertStateEquals(false, 0.0)
-    assertStateEquals(false, 0.9)
-    assertStateEquals(true, 1.0)
-    assertStateEquals(true, 3.0)
-    assertStateEquals(true, 5.4)
-    assertStateEquals(false, 5.5)
-}
+        assertStateEquals(false, 0.0)
+        assertStateEquals(false, 0.9)
+        assertStateEquals(true, 1.0)
+        assertStateEquals(true, 3.0)
+        assertStateEquals(true, 5.4)
+        assertStateEquals(false, 5.5)
+    }
 
 
     @Test
@@ -265,4 +266,48 @@ fun basicTimedEventually5() {
         assertStateEquals(true, 3.5)
         assertStateEquals(true, 5.0)
     }
+
+    // end is true
+    @Test
+    fun basicTimedEventually7() {
+        val formula = "(F[0,4]((\$A) < (\$B)))"
+        load(formula)
+
+        val metricA = MetricDescriptor("", "A")
+        val metricB = MetricDescriptor("", "B")
+
+        // F (false)
+        simulator.forceHandle(TimeInstance(0), metricA, 6.0)
+        simulator.forceHandle(TimeInstance(0), metricB, 5.0)
+        simulator.forceEndRound()
+
+        // F (false)
+        simulator.forceHandle(TimeInstance(2), metricA, 5.0)
+        simulator.forceHandle(TimeInstance(2), metricB, 4.0)
+        simulator.forceEndRound()
+
+        // F (true)
+        simulator.forceHandle(TimeInstance(5), metricA, 2.0)
+        simulator.forceEndRound()
+
+        // F (false)
+        simulator.forceHandle(TimeInstance(6), metricA, 5.0)
+        simulator.forceEndRound()
+
+        // F (true)
+        simulator.forceHandle(TimeInstance(7), metricA, 2.0)
+        simulator.forceEndRound()
+
+
+        simulator.forceEndExperiment(TimeInstance(6))
+
+        assertStateEquals(false, 0.0)
+        assertStateEquals(false, 0.9)
+        assertStateEquals(true, 1.0)
+        assertStateEquals(true, 3.0)
+        assertStateEquals(true, 5.0)
+        assertStateEquals(true, 6.0)
+        assertStateEquals(true, 7.0)
+    }
+
 }

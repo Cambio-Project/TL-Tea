@@ -2,11 +2,10 @@ package cambio.tltea.interpreter.nodes.logic.temporal
 
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.events.InitializeNodeEvent
-import cambio.tltea.interpreter.nodes.events.StateChangeNodeEvent
+import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
-import java.util.concurrent.Delayed
 
 class IdentityTemporalLogic(brokers: Brokers) :
     AbstractTemporalLogic(TemporalInterval(0.0, Double.POSITIVE_INFINITY), brokers) {
@@ -18,26 +17,29 @@ class IdentityTemporalLogic(brokers: Brokers) :
 
         child = children.first()
         if (child.getNodeLogic().getLatestState()) {
-            satisfactionState.addStartEvent(TimeInstance(0))
+            satisfactionState.add(TimeEvent.start(TimeInstance(0)))
+            // satisfactionState.addStartEvent(TimeInstance(0))  TODO: remove
         }
     }
 
-    override fun evaluate(at: TimeInstance) {
-        val stateChange = this.node.getChildren()[0].getNodeLogic().getStateChange(at) ?: return
-        if (stateChange.start) {
-            onChildSatisfied(at, stateChange.isDelayed())
+    override fun evaluate(stateChange: TimeEvent) {
+        val time = stateChange.time
+        if (stateChange.value) {
+            onChildSatisfied(time)
         } else {
-            onChildUnsatisfied(at, stateChange.isDelayed())
+            onChildUnsatisfied(time)
         }
-        updateCurrentTime(at)
+        updateCurrentTime(time)
     }
 
-    private fun onChildSatisfied(time: TimeInstance, delayed: Boolean) {
-        satisfactionState.addStartEvent(time, !delayed)
+    private fun onChildSatisfied(time: TimeInstance) {
+        satisfactionState.add(TimeEvent.start(time))
+        // satisfactionState.addStartEvent(time, !delayed) TODO: remove
     }
 
-    private fun onChildUnsatisfied(time: TimeInstance, delayed: Boolean) {
-        satisfactionState.addEndEvent(time, delayed)
+    private fun onChildUnsatisfied(time: TimeInstance) {
+        satisfactionState.add(TimeEvent.end(time))
+        // satisfactionState.addEndEvent(time, delayed) TODO: remove
     }
 
     /*

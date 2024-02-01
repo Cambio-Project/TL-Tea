@@ -7,13 +7,15 @@ import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.ASTNode
 import cambio.tltea.parser.core.temporal.TimeInstance
 import cambio.tltea.parser.mtl.generated.MTLParser
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.assertEquals
 
 abstract class SimulationTest {
     protected lateinit var simulator: TestEventSimulator
-    protected lateinit var parsedTopNode: ASTNode
-    protected lateinit var topNode: INode<*, *>
+    private lateinit var parsedTopNode: ASTNode
+    private lateinit var topNode: INode<*, *>
     private lateinit var brokers: Brokers
 
     @BeforeEach
