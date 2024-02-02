@@ -21,10 +21,6 @@ class RelationalNode<T : Comparable<T>>(
         left.subscribe { event ->
             handle(
                 StateChangeNodeEvent(
-                    this,
-                    //logic.getLatestState(),
-                    //!logic.getLatestState(),
-                    false,
                     event.`when`() as TimeInstance
                 )
             )
@@ -32,10 +28,6 @@ class RelationalNode<T : Comparable<T>>(
         right.subscribe { event ->
             handle(
                 StateChangeNodeEvent(
-                    this,
-                    //logic.getLatestState(),
-                    //!logic.getLatestState(),
-                    false,
                     event.`when`() as TimeInstance
                 )
             )

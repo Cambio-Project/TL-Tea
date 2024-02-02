@@ -13,7 +13,6 @@ sealed class AbstractTemporalLogic(
     brokers: Brokers
 ) : AbstractLogic(brokers), ITemporalLogic {
     protected val duration: Double = temporalInterval.endAsDouble - temporalInterval.startAsDouble
-    protected val durationInstance = TimeInstance(duration)
 
     override fun initialize(node: INode<Boolean, Boolean>) {
         this.node = node
@@ -29,10 +28,8 @@ sealed class AbstractTemporalLogic(
     }
 
     override fun on(event: EndOfExperimentNodeEvent) {
-        //handleEndOfRound()
         on(EndOfRoundNodeEvent(event.getTime()))
         updateCurrentTime(event.getTime())
-    //publishUpdates(event.getTime())
     }
 
     final override fun forceEvaluate(at: TimeInstance) {

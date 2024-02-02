@@ -10,23 +10,6 @@ sealed class AbstractBoolLogic(
     private val expectedChildCount: Int,
     brokers: Brokers
 ) : AbstractLogic(brokers), IBoolLogic {
-    //protected lateinit var satisfactionState: SatisfactionState
-
-    /*
-    override fun initialize(node: INode<Boolean, Boolean>) {
-        this.satisfactionState = SatisfactionState(node)
-    }
-
-
-    override fun isSatisfiable(): Boolean {
-        return satisfactionState.satisfiable
-    }*/
-
-    /*
-    override fun getLatestState(): Boolean {
-        return satisfactionState.currentTempSatisfied
-    }
-    */
 
     override fun on(event: ActivationChangeNodeEvent) {
         // do nothing
@@ -43,17 +26,11 @@ sealed class AbstractBoolLogic(
     }
 
     private fun onEndOfRound() {
-        //satisfactionState.currentSatisfied = satisfactionState.currentTempSatisfied
+        // do nothing
     }
 
     protected fun updateState(state: Boolean, time: TimeInstance) {
         satisfactionState.add(TimeEvent(time, state))
-        /* TODO: remove
-        if (state) {
-            satisfactionState.addStartEvent(time)
-        } else {
-            satisfactionState.addEndEvent(time)
-        }*/
     }
 
     override fun on(event: InitializeNodeEvent) {
@@ -67,8 +44,8 @@ sealed class AbstractBoolLogic(
         updateCurrentTime(at)
     }
 
-    final override fun evaluate(stateChange: TimeEvent) {
-        forceEvaluate(stateChange.time)
+    final override fun evaluate(changePoint: TimeEvent) {
+        forceEvaluate(changePoint.time)
     }
 
     abstract fun evaluateBool(at: TimeInstance)

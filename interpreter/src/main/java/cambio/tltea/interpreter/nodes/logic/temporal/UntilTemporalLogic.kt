@@ -41,18 +41,6 @@ class UntilTemporalLogic(
         conditionActiveSince = tempConditionActiveSince
     }
 
-    /*
-    override fun on(event: EndOfRoundNodeEvent) {
-        val time = this.getCurrentTime()//event.getTime()
-        prepareEndOfRound(time)
-
-        if (!time.subtractOverflow(temporalInterval.end)) {
-            val updateUntil = time.subtract(temporalInterval.end)
-            //publishUpdates(updateUntil)
-            updateCurrentTime(updateUntil)
-        }
-    }*/
-
     private fun prepareEndOfRound(time: TimeInstance) {
         val conditionActiveChanged = tempConditionActive != conditionActive
         val releaseActiveChanged = tempReleaseActive != releaseActive
@@ -83,30 +71,11 @@ class UntilTemporalLogic(
         if (conditionActive && releaseActive && !oldConditionLongActive && conditionLongActive) {
             val startTime = conditionActiveSince.add(temporalInterval.start)
             satisfactionState.add(TimeEvent.start(startTime))
-            //satisfactionState.addStartEvent(startTime) TODO: remove
         }
     }
 
-    /*
-    override fun on(event: StateChangeNodeEvent) {
-        when (event.publishingNode) {
-            conditionNode -> {
-                onConditionChanged(event)
-            }
-
-            releaseNode -> {
-                onReleaseChanged(event)
-            }
-
-            else -> {
-                throw IllegalArgumentException("Publishing node is not a child")
-            }
-        }
-
-    }*/
-
-    public override fun evaluate(stateChange: TimeEvent) {
-        val time = stateChange.time
+    public override fun evaluate(changePoint: TimeEvent) {
+        val time = changePoint.time
         val stateChangeRelease = this.node.getChildren()[1].getNodeLogic().getStateChange(time)
         if (stateChangeRelease != null) {
             onReleaseChanged(stateChangeRelease)
@@ -119,7 +88,6 @@ class UntilTemporalLogic(
         prepareEndOfRound(time)
         if (!time.subtractOverflow(temporalInterval.end)) {
             val updateUntil = time.subtract(temporalInterval.end)
-            //publishUpdates(updateUntil)
             updateCurrentTime(updateUntil)
         }
     }
@@ -130,25 +98,16 @@ class UntilTemporalLogic(
         } else {
             setConditionInactive()
         }
-        /*
-        val time = event.getTime()
-        if (event.newValue) {
-            setConditionActive(time)
-        } else {
-            setConditionInactive()
-        }
-        */
     }
 
     private fun onConditionSatisfied(time: TimeInstance) {
-        //setConditionActive(time)
+        // do nothing
     }
 
     private fun onConditionUnsatisfied(time: TimeInstance, conditionActiveChanged: Boolean) {
         if (releaseActive && (conditionActive || conditionActiveChanged) && conditionLongActive) {
             val endTime = time.subtract(temporalInterval.start)
             satisfactionState.add(TimeEvent.end(TimeInstance(endTime, true)))
-            // satisfactionState.addEndEvent(endTime, true) TODO: remove
         }
     }
 
@@ -187,13 +146,6 @@ class UntilTemporalLogic(
         } else {
             setReleaseInactive()
         }
-        /*
-        if (event.newValue) {
-            setReleaseActive()
-        } else {
-            setReleaseInactive()
-        }
-        */
     }
 
     private fun onReleaseSatisfied(time: TimeInstance, conditionChanged: Boolean) {
@@ -214,19 +166,15 @@ class UntilTemporalLogic(
         val maxEndTime = time.subtract(temporalInterval.start)
         satisfactionState.deleteEvent(startTime, maxEndTime, false)
         satisfactionState.add(startTimeEvent)
-        // satisfactionState.addStartEvent(startTime) TODO: remove
     }
 
     private fun onReleaseUnsatisfied(time: TimeInstance, conditionActiveChanged: Boolean) {
         if ((conditionActive || conditionActiveChanged) && conditionLongActive) {
             val endTime = time.subtract(temporalInterval.start)
             satisfactionState.delayEvent(endTime, false)
-            //satisfactionState.addEndEvent(endTime)
         } else if (temporalInterval.start.time == 0.0) {
             satisfactionState.delayEvent(time, false)
-            //satisfactionState.addEndEvent(time)
         }
-
     }
 
 }

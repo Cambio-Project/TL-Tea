@@ -23,22 +23,9 @@ class AlwaysTemporalLogic(
         }
     }
 
-    /*
-    override fun on(event: StateChangeNodeEvent) {
-        handleChildUpdate(event.newValue, event.getTime())
-    }
-
-    private fun handleChildUpdate(childState: Boolean, time: TimeInstance) {
-        if (childState) {
-            onChildSatisfied(time)
-        } else {
-            onChildUnsatisfied(time)
-        }
-    }
-    */
-    public override fun evaluate(stateChange: TimeEvent) {
-        val time = stateChange.time
-        if (stateChange.value) {
+    public override fun evaluate(changePoint: TimeEvent) {
+        val time = changePoint.time
+        if (changePoint.value) {
             onChildSatisfied(time)
         } else {
             onChildUnsatisfied(time)
@@ -48,7 +35,7 @@ class AlwaysTemporalLogic(
     override fun on(event: EndOfExperimentNodeEvent) {
         if (active) {
             if (duration == Double.POSITIVE_INFINITY) {
-                onEndInfinityDuration(event.getTime())
+                onEndInfinityDuration()
             } else {
                 onChildSatisfied(event.getTime())
             }
@@ -56,11 +43,10 @@ class AlwaysTemporalLogic(
         super.on(event)
     }
 
-    private fun onEndInfinityDuration(time: TimeInstance) {
+    private fun onEndInfinityDuration() {
         val startTime = activeSince.subtract(temporalInterval.start)
         val startEvent = TimeEvent.start(startTime)
         satisfactionState.add(startEvent)
-    //satisfactionState.addStartEvent(startTime) TODO: remove
     }
 
     private fun isLongActive(time: TimeInstance): Boolean {
@@ -73,7 +59,6 @@ class AlwaysTemporalLogic(
             val startTime = activeSince.subtract(temporalInterval.start)
             val startEvent = TimeEvent.start(startTime)
             satisfactionState.add(startEvent)
-            // satisfactionState.addStartEvent(startTime) TODO: remove
         }
     }
 
@@ -82,7 +67,6 @@ class AlwaysTemporalLogic(
             val endTime = time.subtract(temporalInterval.end)
             val endEvent = TimeEvent.end(endTime)
             satisfactionState.add(endEvent)
-            // satisfactionState.addEndEvent(endTime) TODO: remove
         }
     }
 
@@ -104,7 +88,6 @@ class AlwaysTemporalLogic(
 
         if (!time.subtractOverflow(temporalInterval.end)) {
             val updateUntil = time.subtract(TimeInstance(temporalInterval.end))
-            //publishUpdates(updateUntil)
             updateCurrentTime(updateUntil)
         }
 
@@ -117,7 +100,6 @@ class AlwaysTemporalLogic(
 
         if (!time.subtractOverflow(temporalInterval.start)) {
             val updateUntil = time.subtract(temporalInterval.start)
-            //publishUpdates(updateUntil)
             updateCurrentTime(updateUntil)
         }
     }

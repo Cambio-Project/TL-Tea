@@ -43,13 +43,10 @@ abstract class AbstractLogic(
             this.currentTime = currentTime
             node.getParent()?.handle(
                 StateChangeNodeEvent(
-                    node,
-                    false,
                     currentTime
                 )
             )
         }
-//update.start, !update.start, delayed, update.time))
     }
 
     final override fun getState(time: TimeInstance): Boolean {
@@ -74,20 +71,6 @@ abstract class AbstractLogic(
     protected abstract fun on(event: InitializeNodeEvent)
 
     protected fun evaluate(from: TimeInstance, to: TimeInstance) {
-        /*
-        val changePoints: TreeSet<TimeInstance> = TreeSet()
-        changePoints.add(to) // force update at the end
-        for (child in node.getChildren()) {
-            val changes = child.getNodeLogic().getStateChanges(from, to)
-            for (change in changes) {
-                changePoints.add(change.time)
-            }
-        }
-
-        for (time in changePoints.sorted()) {
-            evaluate(time)
-        }
-        */
         val changePoints: HashSet<TimeEvent> = HashSet()
         for (child in node.getChildren()) {
             val changes = child.getNodeLogic().getStateChanges(from, to)
@@ -103,13 +86,13 @@ abstract class AbstractLogic(
         forceEvaluate(to)
     }
 
-    protected abstract fun evaluate(at: TimeEvent)
+    protected abstract fun evaluate(changePoint: TimeEvent)
     protected abstract fun forceEvaluate(at: TimeInstance)
 
     private fun on(event: StateChangeNodeEvent) {
         val until = getSmallestChildUpdateTime(event.getTime())
         if (evaluationNecessary(until)) {
-            val from = handledChildrenUntil//getCurrentTime()
+            val from = handledChildrenUntil
             evaluate(from, until)
             this.handledChildrenUntil = until
         }
@@ -129,14 +112,11 @@ abstract class AbstractLogic(
     protected open fun publishUpdates(fromTime: TimeInstance, toTime: TimeInstance) {
         val eventsToPublish = satisfactionState.findTimeInstanceMarkers(fromTime, toTime)
         for (event in eventsToPublish) {
-            val delayed = event.time.isPlusEpsilon
             node.getParent()?.handle(
                 StateChangeNodeEvent(
-                    node,
-                    delayed,
                     event.time
                 )
-            )//update.start, !update.start, delayed, update.time))
+            )
         }
         if (toTime > this.lastUpdateSent) {
             this.lastUpdateSent = toTime

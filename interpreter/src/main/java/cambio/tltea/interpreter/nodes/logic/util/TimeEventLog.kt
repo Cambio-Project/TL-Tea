@@ -23,15 +23,6 @@ open class TimeEventLog {
         }
 
         val timeInstancesToRemove = findTimeInstanceMarkers(start.time, end.time)
-        // TODO: Remove
-        /*
-        if (timeInstancesToRemove.isNotEmpty()) {
-            val lastValue = timeInstancesToRemove.last().value
-            if (end.value == lastValue) {
-                timeInstancesToRemove.removeLast()
-            }
-        }
-        */
         events.removeAll(timeInstancesToRemove)
 
         add(start)
@@ -136,17 +127,6 @@ open class TimeEventLog {
         }
     }
 
-    /*
-    fun deleteEqualEvent(event: TimeEvent) {
-        for (foundEvent in findTimeInstanceMarker(event.time)) {
-            if (foundEvent.value == event.value) {
-                events.remove(event)
-            }
-        }
-    }
-     */
-
-    // needs to be same!
     fun deleteEvent(event: TimeEvent) {
         events.remove(event)
     }
@@ -189,9 +169,6 @@ open class TimeEventLog {
         val intervalPoints: MutableList<TimeEvent> = events.toMutableList()
 
         if (intervalPoints.isNotEmpty()) {
-            //if (!intervalPoints.first().start) {
-            //    intervalPoints.add(0, RangeTimeInstance(TimeInstance(0), true, true))
-            //}
             if (intervalPoints.last().value) {
                 intervalPoints.add(TimeEvent(TimeInstance(Double.POSITIVE_INFINITY), false))
             }
@@ -208,7 +185,7 @@ open class TimeEventLog {
                     startEvent.time.time,
                     endEvent.time.time,
                     !startEvent.time.isPlusEpsilon,
-                    endEvent.time.isPlusEpsilon // TODO: double check
+                    endEvent.time.isPlusEpsilon
                 )
             )
         }
