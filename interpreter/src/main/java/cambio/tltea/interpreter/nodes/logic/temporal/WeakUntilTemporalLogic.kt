@@ -8,10 +8,13 @@ import cambio.tltea.interpreter.nodes.logic.util.TimeEventLog
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
+import java.sql.Time
+import java.util.Optional
 
 class WeakUntilTemporalLogic(
     temporalInterval: TemporalInterval = TemporalInterval(0.0, Double.POSITIVE_INFINITY), brokers: Brokers
 ) : AbstractTemporalLogic(temporalInterval, brokers), INode<Boolean, Boolean> {
+    private val infinityTimeEvent = TimeEvent(TimeInstance(Double.POSITIVE_INFINITY), true)
     private val untilOperator = UntilTemporalLogic(temporalInterval, brokers)
     private val alwaysOperator = AlwaysTemporalLogic(temporalInterval, brokers)
     private val untilOperatorEvents = TimeEventLog()
@@ -101,20 +104,23 @@ class WeakUntilTemporalLogic(
     }
 
     private fun updateSatisfactionState(fromTime: TimeInstance, toTime: TimeInstance) {
-        val happenedEvents = ArrayList<TimeEvent>()
-        happenedEvents.addAll(alwaysOperatorEvents.findTimeEvents(fromTime, toTime))
-        happenedEvents.addAll(untilOperatorEvents.findTimeEvents(fromTime, toTime))
-        happenedEvents.sort()
-        for (event in happenedEvents) {
+        val alwaysEvents = alwaysOperatorEvents.findTimeEvents(fromTime, toTime).iterator()
+        val untilEvents = untilOperatorEvents.findTimeEvents(fromTime, toTime).iterator()
+        val iterator = SortedIterator(alwaysEvents, untilEvents)
+
+        while (iterator.hasNext()) {
+            val (source, event) = iterator.next()
             if (event.value) {
                 satisfactionState.add(event)
             } else {
-                // TODO: consider including properly
-                if ((untilOperatorEvents.contains(event) && !alwaysOperatorEvents.evaluate(event.time)) || (alwaysOperatorEvents.contains(
-                        event
-                    ) && !untilOperatorEvents.evaluate(event.time))
-                ) {
-                    satisfactionState.add(event)
+                if (source == alwaysEvents) {
+                    if (!untilOperatorEvents.evaluate(event.time)) {
+                        satisfactionState.add(event)
+                    }
+                } else {
+                    if (!alwaysOperatorEvents.evaluate(event.time)) {
+                        satisfactionState.add(event)
+                    }
                 }
             }
         }
@@ -130,6 +136,59 @@ class WeakUntilTemporalLogic(
 
     override fun getNodeLogic(): ILogic {
         return this
+    }
+
+    /**
+     * Merges two (sorted) time event iterators and always returns the chronological next event.
+     */
+    inner class SortedIterator(
+        private val firstIterator: Iterator<TimeEvent>,
+        private val secondIterator: Iterator<TimeEvent>
+    ) : Iterator<Pair<Iterator<TimeEvent>, TimeEvent>> {
+        private var firstNext: Optional<TimeEvent> = Optional.empty()
+        private var secondNext: Optional<TimeEvent> = Optional.empty()
+
+        init {
+            getFirstNext()
+            getSecondNext()
+        }
+
+        override fun hasNext(): Boolean {
+            return firstNext.isPresent || secondNext.isPresent
+        }
+
+        override fun next(): Pair<Iterator<TimeEvent>, TimeEvent> {
+            val firstTime = firstNext.orElse(infinityTimeEvent)
+            val secondTime = secondNext.orElse(infinityTimeEvent)
+            val next: TimeEvent
+            val nextSource: Iterator<TimeEvent>
+            if (firstTime <= secondTime) {
+                next = firstNext.orElse(null)
+                nextSource = firstIterator
+                getFirstNext()
+            } else {
+                next = secondNext.orElse(null)
+                nextSource = secondIterator
+                getSecondNext()
+            }
+            return Pair(nextSource, next)
+        }
+
+        private fun getFirstNext() {
+            firstNext = if (firstIterator.hasNext()) {
+                Optional.of(firstIterator.next())
+            } else {
+                Optional.empty()
+            }
+        }
+
+        private fun getSecondNext() {
+            secondNext = if (secondIterator.hasNext()) {
+                Optional.of(secondIterator.next())
+            } else {
+                Optional.empty()
+            }
+        }
     }
 
 }
