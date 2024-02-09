@@ -7,8 +7,6 @@ import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.ASTNode
 import cambio.tltea.parser.core.temporal.TimeInstance
 import cambio.tltea.parser.mtl.generated.MTLParser
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import kotlin.test.assertEquals
 
@@ -33,14 +31,10 @@ abstract class SimulationTest {
     }
 
     protected fun assertStateEquals(expected: Boolean) {
-        // TODO: remove
-        println(topNode.getNodeLogic().getCurrentTime().time)
         assertEquals(expected, topNode.getNodeLogic().getLatestState())
     }
 
     protected fun assertStateEquals(expected: Boolean, time: Double) {
-        // TODO: remove
-        println(time)
         assertEquals(expected, (topNode.getNodeLogic() as ITemporalLogic).getState(TimeInstance(time)))
     }
 

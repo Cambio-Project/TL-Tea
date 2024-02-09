@@ -110,7 +110,7 @@ abstract class AbstractLogic(
     }
 
     protected open fun publishUpdates(fromTime: TimeInstance, toTime: TimeInstance) {
-        val eventsToPublish = satisfactionState.findTimeInstanceMarkers(fromTime, toTime)
+        val eventsToPublish = satisfactionState.findTimeEvents(fromTime, toTime)
         for (event in eventsToPublish) {
             node.getParent()?.handle(
                 StateChangeNodeEvent(
@@ -138,11 +138,11 @@ abstract class AbstractLogic(
 
     // including
     override fun getStateChanges(from: TimeInstance, to: TimeInstance): List<TimeEvent> {
-        return satisfactionState.findTimeInstanceMarkers(from, to)
+        return satisfactionState.findTimeEvents(from, to)
     }
 
     override fun getStateChange(at: TimeInstance): TimeEvent? {
-        return satisfactionState.findRangeTimeInstance(at)
+        return satisfactionState.findTimeEvent(at)
     }
 
 }

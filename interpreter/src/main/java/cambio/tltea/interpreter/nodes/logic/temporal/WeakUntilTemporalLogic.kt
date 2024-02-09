@@ -102,8 +102,8 @@ class WeakUntilTemporalLogic(
 
     private fun updateSatisfactionState(fromTime: TimeInstance, toTime: TimeInstance) {
         val happenedEvents = ArrayList<TimeEvent>()
-        happenedEvents.addAll(alwaysOperatorEvents.findTimeInstanceMarkers(fromTime, toTime))
-        happenedEvents.addAll(untilOperatorEvents.findTimeInstanceMarkers(fromTime, toTime))
+        happenedEvents.addAll(alwaysOperatorEvents.findTimeEvents(fromTime, toTime))
+        happenedEvents.addAll(untilOperatorEvents.findTimeEvents(fromTime, toTime))
         happenedEvents.sort()
         for (event in happenedEvents) {
             if (event.value) {
@@ -124,7 +124,7 @@ class WeakUntilTemporalLogic(
         return node.getChildren()
     }
 
-    override fun getParent(): INode<Boolean, Boolean>? {
+    override fun getParent(): INode<Boolean, Boolean> {
         return this // reroutes updates to parent to this instance
     }
 

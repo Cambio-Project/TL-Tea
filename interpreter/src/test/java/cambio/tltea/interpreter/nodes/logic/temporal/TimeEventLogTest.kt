@@ -540,7 +540,7 @@ class TimeEventLogTest {
 
         val nextStart = log.findNextEventWithSameValueExcluding(TimeInstance(findPoint), true)
 
-        assertEquals(5.0, nextStart.time.time)
+        assertEquals(5.0, nextStart.second.time.time)
     }
 
     @Test
@@ -559,7 +559,7 @@ class TimeEventLogTest {
 
         val nextStart = log.findNextEventWithSameValueExcluding(TimeInstance(findPoint), true)
 
-        assertEquals(Double.POSITIVE_INFINITY, nextStart.time.time)
+        assertEquals(Double.POSITIVE_INFINITY, nextStart.second.time.time)
     }
 
     @Test
@@ -578,7 +578,7 @@ class TimeEventLogTest {
 
         val nextStart = log.findNextEventWithSameValueExcluding(TimeInstance(findPoint), true)
 
-        assertEquals(1.0, nextStart.time.time)
+        assertEquals(1.0, nextStart.second.time.time)
     }
 
     @Test
@@ -586,7 +586,7 @@ class TimeEventLogTest {
         val log = TimeEventLog()
         val findPoint = 1.0
         val nextStart = log.findNextEventWithSameValueExcluding(TimeInstance(findPoint), true)
-        assertEquals(Double.POSITIVE_INFINITY, nextStart.time.time)
+        assertEquals(Double.POSITIVE_INFINITY, nextStart.second.time.time)
     }
 
     @Test

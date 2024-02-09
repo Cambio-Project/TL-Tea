@@ -4,22 +4,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public final class TimeInstance implements ITemporalValue, Comparable<TimeInstance> {
-    private final double time;
-    private final boolean plusEpsilon;
+public record TimeInstance(double time, boolean plusEpsilon) implements ITemporalValue, Comparable<TimeInstance> {
 
-    public TimeInstance(double time, boolean plusEpsilon) {
-        this.time = time;
-        this.plusEpsilon = plusEpsilon;
+    public TimeInstance(int time, boolean plusEpsilon) {
+        this(Double.valueOf(time), plusEpsilon);
     }
 
     public TimeInstance(double time) {
         this(time, false);
-    }
-
-    public TimeInstance(int time, boolean plusEpsilon) {
-        this.time = time;
-        this.plusEpsilon = plusEpsilon;
     }
 
     public TimeInstance(int time) {
@@ -27,18 +19,15 @@ public final class TimeInstance implements ITemporalValue, Comparable<TimeInstan
     }
 
     public TimeInstance(@NotNull TimeInstance other) {
-        this.time = other.time;
-        this.plusEpsilon = other.plusEpsilon;
+        this(other.time, other.plusEpsilon);
     }
 
     public TimeInstance(@NotNull TimeInstance other, boolean plusEpsilon) {
-        this.time = other.time;
-        this.plusEpsilon = plusEpsilon;
+        this(other.time, plusEpsilon);
     }
 
     public TimeInstance(@NotNull Number time, boolean plusEpsilon) {
-        this.time = time.doubleValue();
-        this.plusEpsilon = plusEpsilon;
+        this(time.doubleValue(), plusEpsilon);
     }
 
     public TimeInstance(@NotNull Number time) {
@@ -98,22 +87,6 @@ public final class TimeInstance implements ITemporalValue, Comparable<TimeInstan
         } else {
             return timeComparison;
         }
-    }
-
-    public boolean isAfter(TimeInstance fromPoint) {
-        return this.compareTo(fromPoint) > 0;
-    }
-
-    public boolean isBefore(TimeInstance fromPoint) {
-        return this.compareTo(fromPoint) < 0;
-    }
-
-    public boolean isBeforeEquals(TimeInstance fromPoint) {
-        return this.compareTo(fromPoint) <= 0;
-    }
-
-    public boolean isAfterEquals(TimeInstance fromPoint) {
-        return this.compareTo(fromPoint) >= 0;
     }
 
     @Override
