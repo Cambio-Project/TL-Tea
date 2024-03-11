@@ -140,14 +140,13 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <distributionManagement>
         <repository>
-            <id>jitpack</id>
-            <name>Jitpack Package Repository</name>
-            <url>https://jitpack.io/com/github/Cambio-Project/TL-Tea/</url>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/Cambio-Project/TL-Tea</url>
         </repository>
-        <downloadUrl>https://jitpack.io/com/github/Cambio-Project/TL-Tea/${project.version}</downloadUrl>
     </distributionManagement>
 
 
