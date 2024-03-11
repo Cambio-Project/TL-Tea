@@ -16,13 +16,15 @@ class ComparisonCauseNodeTest {
                                        ValueListener<?> value1,
                                        ValueListener<?> value2,
                                        OperatorToken op) {
-        ComparisonCauseNode node = new ComparisonCauseNode(op, null, value1, value2);
+        ComparisonCauseNode node = new ComparisonCauseNode(op, null, (ValueListener<Comparable<Object>>) value1,
+            (ValueListener<Comparable<Object>>) value2);
         Assertions.assertEquals(expected, node.getCurrentValue());
     }
 
     private static void testThrowsException(ValueListener<?> value1, ValueListener<?> value2, OperatorToken op) {
         try {
-            new ComparisonCauseNode(op, null, value1, value2).getCurrentValue();
+            new ComparisonCauseNode(op, null, (ValueListener<Comparable<Object>>) value1,
+                (ValueListener<Comparable<Object>>) value2).getCurrentValue();
         } catch (IllegalStateException | IllegalArgumentException e) {
             return;
         }
@@ -45,16 +47,17 @@ class ComparisonCauseNodeTest {
         ConstantValueProvider<String> value = new ConstantValueProvider<>("a");
         ConstantValueProvider<String> other = new ConstantValueProvider<>("B");
         testEQNEQ(value, other);
-        testThrowsException(value, other, OperatorToken.GT);
-        testThrowsException(value, other, OperatorToken.GEQ);
-        testThrowsException(value, other, OperatorToken.LT);
-        testThrowsException(value, other, OperatorToken.LEQ);
+        // Currently exception is not expected, using Javas String comparison interpretation
+        //testThrowsException(value, other, OperatorToken.GT);
+        //testThrowsException(value, other, OperatorToken.GEQ);
+        //testThrowsException(value, other, OperatorToken.LT);
+        //testThrowsException(value, other, OperatorToken.LEQ);
 
     }
 
 
-    private static void testComparisonOperators(ValueListener<Number> smallProvider,
-                                                ValueListener<Number> largeProvider) {
+    private static <T extends Comparable<T>> void testComparisonOperators(ValueListener<T> smallProvider,
+                                                ValueListener<T> largeProvider) {
         testComparison(true, smallProvider, smallProvider, OperatorToken.EQ);
         testComparison(true, smallProvider, smallProvider.clone(), OperatorToken.EQ);
         testComparison(false, smallProvider, smallProvider, OperatorToken.NEQ);
@@ -70,33 +73,11 @@ class ComparisonCauseNodeTest {
     }
 
     @Test
-    void numberComparisonTest() {
+    void numberComparisonDoubleTest() {
 
         Random rng = new Random();
 
-        BiConsumer<Number, Number> constantNumberProviderTest = (smaller, larger) -> {
-            ConstantValueProvider<Number> smallProvider = new ConstantValueProvider<>(smaller);
-            ConstantValueProvider<Number> largeProvider = new ConstantValueProvider<>(larger);
-
-            testEQNEQ(smallProvider, largeProvider);
-
-            testComparisonOperators(smallProvider, largeProvider);
-
-            Arrays.stream(OperatorToken.values())
-                  .filter(op -> !OperatorToken.ComparisonOperatorTokens.contains(op))
-                  .forEach(op -> testThrowsException(smallProvider, largeProvider, op));
-        };
-
-
-        for (int i = 0; i < 1000; i++) {
-            int other, value = rng.nextInt();
-
-            do {
-                other = rng.nextInt();
-            } while (other >= value);
-
-            constantNumberProviderTest.accept(other, value);
-        }
+        BiConsumer<Double, Double> constantNumberProviderTest = createConstantNumberProviderTest();
 
         for (int i = 0; i < 1000; i++) {
             double other, value = Integer.MAX_VALUE * rng.nextDouble();
@@ -107,6 +88,42 @@ class ComparisonCauseNodeTest {
 
             constantNumberProviderTest.accept(other, value);
         }
+    }
+
+    @Test
+    void numberComparisonIntegerTest() {
+
+        Random rng = new Random();
+
+        BiConsumer<Integer, Integer> constantNumberProviderTest = createConstantNumberProviderTest();
+
+        for (int i = 0; i < 1000; i++) {
+            int other, value = rng.nextInt();
+
+            do {
+                other = rng.nextInt();
+            } while (other >= value);
+
+            constantNumberProviderTest.accept(other, value);
+        }
+    }
+
+    private <T extends Comparable<T>> BiConsumer<T, T> createConstantNumberProviderTest() {
+
+        Random rng = new Random();
+
+        return (smaller, larger) -> {
+            ConstantValueProvider<T> smallProvider = new ConstantValueProvider<>(smaller);
+            ConstantValueProvider<T> largeProvider = new ConstantValueProvider<>(larger);
+
+            testEQNEQ(smallProvider, largeProvider);
+
+            testComparisonOperators(smallProvider, largeProvider);
+
+            Arrays.stream(OperatorToken.values())
+                .filter(op -> !OperatorToken.ComparisonOperatorTokens.contains(op))
+                .forEach(op -> testThrowsException(smallProvider, largeProvider, op));
+        };
     }
 
     abstract static class Parent<T> implements Comparable<Parent<T>> {
@@ -201,11 +218,12 @@ class ComparisonCauseNodeTest {
 
     }
 
-    @Test
+    // Currently not supported anymore
+    /*@Test
     void oneWayObjectComparisonTest(){
 
         var smallProvider2 = new ConstantValueProvider<>(1);
-        var largeProvider2 = new ConstantValueProvider<>(new IntComparable(2));
+        var largeProvider2 = new ConstantValueProvider<Integer>(new IntComparable(2));
 
         testComparison(true, smallProvider2, smallProvider2, OperatorToken.EQ);
         testComparison(true, smallProvider2, smallProvider2.clone(), OperatorToken.EQ);
@@ -229,5 +247,5 @@ class ComparisonCauseNodeTest {
         testComparison(true, notComparable, notComparableComparable.clone(), OperatorToken.EQ);
         testComparison(false, notComparable, notComparableComparable, OperatorToken.NEQ);
         testComparison(false, notComparable, notComparableComparable.clone(), OperatorToken.NEQ);
-    }
+    }*/
 }

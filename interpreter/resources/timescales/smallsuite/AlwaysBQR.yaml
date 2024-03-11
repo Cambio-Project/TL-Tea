@@ -1,0 +1,3 @@
+---
+name : "AlwaysBQR"
+pattern : "always( (  q(x) and !r(z) and once(r(z)) ) -> ( p(y) since[3,10] r(z) )  )"

@@ -1,0 +1,3 @@
+---
+name : "AbsentAQ"
+pattern : "always(  q(y) -> always[0,10](not(p(x)))  )"

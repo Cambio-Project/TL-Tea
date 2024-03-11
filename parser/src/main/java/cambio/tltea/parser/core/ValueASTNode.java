@@ -39,9 +39,7 @@ public final class ValueASTNode extends ASTNode {
 
     @Override
     public String toString() {
-        return "ValueASTNode{" +
-               "value='" + value + '\'' +
-               '}';
+        return "ValueASTNode{" + "value='" + value + '\'' + '}';
     }
 
     @Override
@@ -69,5 +67,24 @@ public final class ValueASTNode extends ASTNode {
 
     public boolean containsPropertyAccess() {
         return value.contains("$");
+    }
+
+    /*
+    TODO: This is not ideal and should actually be implemented in the Parsing process.
+     */
+    public boolean isBooleanConstant() {
+        if (containsEventName()) {
+            String eventName = getEventName().toLowerCase();
+            return eventName.toLowerCase().equals("true") || eventName.toLowerCase().equals("false");
+        } else {
+            return false;
+        }
+    }
+
+    /*
+TODO: This is not ideal and should actually be implemented in the Parsing process.
+ */
+    public boolean returnBooleanConstant() {
+        return getEventName().toLowerCase().equals("true");
     }
 }
