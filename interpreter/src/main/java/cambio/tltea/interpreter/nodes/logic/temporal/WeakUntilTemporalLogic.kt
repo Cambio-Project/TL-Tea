@@ -8,7 +8,6 @@ import cambio.tltea.interpreter.nodes.logic.util.TimeEventLog
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
-import java.sql.Time
 import java.util.Optional
 
 class WeakUntilTemporalLogic(
