@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 abstract class SimulationTest {
     protected lateinit var simulator: TestEventSimulator
     private lateinit var parsedTopNode: ASTNode
-    private lateinit var topNode: INode<*, *>
+    private lateinit var topNodes: List<INode<*, *>>
     private lateinit var brokers: Brokers
 
     @BeforeEach
@@ -26,16 +26,30 @@ abstract class SimulationTest {
     protected fun load(mtlFormula: String) {
         parsedTopNode = MTLParser.parse(mtlFormula)
         val interpretAsBehavior = Interpreter2.interpretAsBehavior(parsedTopNode, brokers)
-        topNode = interpretAsBehavior.treeDescription.causeASTRoot
+        topNodes = listOf(interpretAsBehavior.treeDescription.causeASTRoot)
         interpretAsBehavior.activateProcessing()
     }
 
+    protected fun load(mtlFormula: List<String>) {
+        val interpretAsBehaviors = Interpreter2.interpretAllAsBehavior(mtlFormula, brokers)
+        val allTopNodes = mutableListOf<INode<*, *>>()
+        for(interpretAsBehavior in interpretAsBehaviors){
+            allTopNodes.add(interpretAsBehavior.treeDescription.causeASTRoot)
+            interpretAsBehavior.activateProcessing()
+        }
+        topNodes = allTopNodes
+    }
+
     protected fun assertStateEquals(expected: Boolean) {
-        assertEquals(expected, topNode.getNodeLogic().getLatestState())
+        assertEquals(expected, topNodes[0].getNodeLogic().getLatestState())
+    }
+
+    protected fun assertStateEquals(index: Int, expected: Boolean) {
+        assertEquals(expected, topNodes[index].getNodeLogic().getLatestState())
     }
 
     protected fun assertStateEquals(expected: Boolean, time: Double) {
-        assertEquals(expected, (topNode.getNodeLogic() as ITemporalLogic).getState(TimeInstance(time)))
+        assertEquals(expected, (topNodes[0].getNodeLogic() as ITemporalLogic).getState(TimeInstance(time)))
     }
 
 }

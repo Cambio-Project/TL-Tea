@@ -17,7 +17,11 @@ import java.util.*
  */
 object Interpreter2 {
 
-    fun interpretAllAsBehavior(mtlLoc: String, brokers: Brokers, isDebugOn: Boolean = false): List<BehaviorInterpretationResult2> {
+    fun interpretAllAsBehavior(
+        mtlLoc: String,
+        brokers: Brokers,
+        isDebugOn: Boolean = false
+    ): List<BehaviorInterpretationResult2> {
         Objects.requireNonNull(mtlLoc)
         try {
             if (!Paths.get(mtlLoc).toFile().exists()) {
@@ -39,21 +43,20 @@ object Interpreter2 {
 
     fun interpretAllAsBehavior(
         formulas: Collection<String>,
-        brokers : Brokers,
+        brokers: Brokers,
         isDebugOn: Boolean = false
     ): List<BehaviorInterpretationResult2> {
         Objects.requireNonNull(formulas)
         val results = mutableListOf<BehaviorInterpretationResult2>()
         for (formula in formulas) {
-            val parsed = MTLParser.parse(formula)
-            results.add(interpretAsBehavior(parsed, brokers))
+            results.add(interpretAsBehavior(formula, brokers))
         }
         return results
     }
 
     fun interpretAsBehavior(
         mlt_formula: String,
-        brokers : Brokers
+        brokers: Brokers
     ): BehaviorInterpretationResult2 {
         return interpretAsBehavior(MTLParser.parse(mlt_formula), brokers)
     }
