@@ -6,7 +6,7 @@ import cambio.tltea.interpreter.nodes.logic.util.TimeEvent
 import cambio.tltea.parser.core.temporal.TemporalInterval
 import cambio.tltea.parser.core.temporal.TimeInstance
 
-class EventuallyTemporalLogic(
+open class EventuallyTemporalLogic(
     temporalInterval: TemporalInterval = TemporalInterval(0.0, Double.POSITIVE_INFINITY), brokers: Brokers
 ) :
     AbstractTemporalLogic(temporalInterval, brokers) {

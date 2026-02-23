@@ -3,6 +3,7 @@ package cambio.tltea.interpreter.factories
 import cambio.tltea.interpreter.connector.Brokers
 import cambio.tltea.interpreter.nodes.logic.temporal.AlwaysTemporalLogic
 import cambio.tltea.interpreter.nodes.logic.temporal.EventuallyTemporalLogic
+import cambio.tltea.interpreter.nodes.logic.temporal.NextTemporalLogic
 import cambio.tltea.interpreter.nodes.structure.INode
 import cambio.tltea.interpreter.nodes.structure.TemporalStateNode
 import cambio.tltea.parser.core.ASTNode
@@ -31,6 +32,10 @@ class TemporalUnaryOperationASTNodeFactory(private val brokers: Brokers) : INode
 
             OperatorToken.GLOBALLY -> {
                 TemporalStateNode(interpreterRoot, AlwaysTemporalLogic(temporalInterval, brokers))
+            }
+
+            OperatorToken.NEXT -> {
+                TemporalStateNode(interpreterRoot, NextTemporalLogic(brokers))
             }
 
             else -> {
