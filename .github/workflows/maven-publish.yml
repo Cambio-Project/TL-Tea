@@ -21,7 +21,10 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: temurin
+        server-id: github
+        server-username: GITHUB_ACTOR
+        server-password: GITHUB_TOKEN
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
@@ -29,4 +32,4 @@ jobs:
     - name: Publish to GitHub Packages Apache Maven
       run: mvn -B deploy
       env:
-        GITHUB_TOKEN: ${{ secrets.PAT_PUBLISH }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
