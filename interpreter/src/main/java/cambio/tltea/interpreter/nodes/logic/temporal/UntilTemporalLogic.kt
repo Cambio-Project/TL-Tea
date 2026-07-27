@@ -105,9 +105,13 @@ class UntilTemporalLogic(
     }
 
     private fun onConditionUnsatisfied(time: TimeInstance, conditionActiveChanged: Boolean) {
-        if (releaseActive && (conditionActive || conditionActiveChanged) && conditionLongActive) {
-            val endTime = time.subtract(temporalInterval.start)
-            satisfactionState.add(TimeEvent.end(TimeInstance(endTime, true)))
+        // If start is 0, then the condition must not be active for UNTIL to be satisfied.
+        val conditionNecessary = temporalInterval.start.isPlusEpsilon || temporalInterval.start.time > 0.0;
+        if (conditionNecessary) {
+            if (releaseActive && (conditionActive || conditionActiveChanged) && conditionLongActive) {
+                val endTime = time.subtract(temporalInterval.start)
+                satisfactionState.add(TimeEvent.end(TimeInstance(endTime, true)))
+            }
         }
     }
 

@@ -595,4 +595,41 @@ class UntilSimulationTests : SimulationTest() {
         assertStateEquals(false, 2.0)
     }
 
+    @Test
+    fun basicTimedReleaseAlwaysSatisfied() {
+        val formula = "(((\$P) > 0)) U (((\$R) > 0))"
+        load(formula)
+
+        val metricP = MetricDescriptor("", "P")
+        val metricR = MetricDescriptor("", "R")
+
+        // (true) U (true)
+        simulator.forceHandle(TimeInstance(0), metricP, 1.0)
+        simulator.forceHandle(TimeInstance(0), metricR, 1.0)
+        simulator.forceEndRound()
+
+        simulator.forceHandle(TimeInstance(3), metricP, 0.0)
+        simulator.forceEndRound()
+
+        simulator.forceHandle(TimeInstance(5), metricP, 1.0)
+        simulator.forceEndRound()
+
+        simulator.forceHandle(TimeInstance(7), metricP, 0.0)
+        simulator.forceEndRound()
+
+        simulator.forceHandle(TimeInstance(8), metricP, 1.0)
+        simulator.forceEndRound()
+
+        simulator.forceEndExperiment(TimeInstance(10))
+        assertStateEquals(true, 0.0)
+        assertStateEquals(true, 3.0)
+        assertStateEquals(true, 3.1)
+        assertStateEquals(true, 4.0)
+        assertStateEquals(true, 5.0)
+        assertStateEquals(true, 7.0)
+        assertStateEquals(true, 7.1)
+        assertStateEquals(true, 8.0)
+        assertStateEquals(true, 10.0)
+    }
+
 }
