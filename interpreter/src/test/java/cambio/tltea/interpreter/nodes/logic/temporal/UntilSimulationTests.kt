@@ -429,6 +429,41 @@ class UntilSimulationTests : SimulationTest() {
     }
 
     @Test
+    fun basicTimedUntilSatisfied2() {
+        val formula = "(((\$A) = (\$B))U[1,4]((\$C) = (\$D)))"
+        load(formula)
+
+        val metricA = MetricDescriptor("", "A")
+        val metricB = MetricDescriptor("", "B")
+        val metricC = MetricDescriptor("", "C")
+        val metricD = MetricDescriptor("", "D")
+
+        // (true) U (false)
+        simulator.forceHandle(TimeInstance(0), metricA, 1.0)
+        simulator.forceHandle(TimeInstance(0), metricB, 1.0)
+        simulator.forceHandle(TimeInstance(0), metricC, 0.0)
+        simulator.forceHandle(TimeInstance(0), metricD, 1.0)
+        simulator.forceEndRound()
+
+        // (true) U (true)
+        simulator.forceHandle(TimeInstance(7), metricC, 1.0)
+        simulator.forceEndRound()
+
+        // (true) U (false)
+        simulator.forceHandle(TimeInstance(7.1), metricC, 0.0)
+        simulator.forceEndRound()
+
+        simulator.forceEndExperiment(TimeInstance(12))
+        assertStateEquals(false, 0.0)
+        assertStateEquals(false, 2.9)
+        assertStateEquals(true, 3.0)
+        assertStateEquals(true, 6.0)
+        assertStateEquals(false, 6.1)
+        assertStateEquals(false, 7.0)
+        assertStateEquals(false, 10.0)
+    }
+
+    @Test
     fun basicTimedUntilSatisfied() {
         val formula = "(((\$A) = (\$B))U[1,3]((\$C) = (\$D)))"
         load(formula)

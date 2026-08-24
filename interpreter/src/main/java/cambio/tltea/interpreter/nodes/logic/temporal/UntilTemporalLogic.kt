@@ -69,7 +69,10 @@ class UntilTemporalLogic(
         checkAndSetConditionActiveLong(time, conditionActiveChanged)
 
         if (conditionActive && releaseActive && !oldConditionLongActive && conditionLongActive) {
-            val startTime = conditionActiveSince.add(temporalInterval.start)
+            val earliestStartTime = conditionActiveSince.add(temporalInterval.start)
+            val calculatedStartTime = time.subtract(temporalInterval.end)
+            // The start time is the later of the two times, because the condition must have been active for at least the duration of the temporal interval.
+            val startTime = if (earliestStartTime > calculatedStartTime) earliestStartTime else calculatedStartTime
             satisfactionState.add(TimeEvent.start(startTime))
         }
     }
