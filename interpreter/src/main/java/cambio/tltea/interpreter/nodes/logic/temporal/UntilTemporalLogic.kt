@@ -69,7 +69,7 @@ class UntilTemporalLogic(
         checkAndSetConditionActiveLong(time, conditionActiveChanged)
 
         if (conditionActive && releaseActive && !oldConditionLongActive && conditionLongActive) {
-            val earliestStartTime = conditionActiveSince.add(temporalInterval.start)
+            val earliestStartTime = conditionActiveSince
             val calculatedStartTime = time.subtract(temporalInterval.end)
             // The start time is the later of the two times, because the condition must have been active for at least the duration of the temporal interval.
             val startTime = if (earliestStartTime > calculatedStartTime) earliestStartTime else calculatedStartTime
@@ -77,8 +77,19 @@ class UntilTemporalLogic(
         }
     }
 
+    private var lastUpdateTime: TimeInstance = TimeInstance(0);
+
     public override fun evaluate(changePoint: TimeEvent) {
         val time = changePoint.time
+
+        // Reiterate through all time steps since the last update to ensure that we catch any changes that may have occurred in between.
+        var previousTime = lastUpdateTime
+        while (previousTime < time) {
+            prepareEndOfRound(previousTime)
+            previousTime = previousTime.add(TimeInstance(1))
+        }
+        lastUpdateTime = time;
+
         val stateChangeRelease = this.node.getChildren()[1].getNodeLogic().getStateChange(time)
         if (stateChangeRelease != null) {
             onReleaseChanged(stateChangeRelease)
@@ -89,10 +100,12 @@ class UntilTemporalLogic(
         }
 
         prepareEndOfRound(time)
+
         if (!time.subtractOverflow(temporalInterval.end)) {
             val updateUntil = time.subtract(temporalInterval.end)
             updateCurrentTime(updateUntil)
         }
+
     }
 
     private fun onConditionChanged(stateChange: TimeEvent) {
@@ -113,7 +126,8 @@ class UntilTemporalLogic(
         if (conditionNecessary) {
             if (releaseActive && (conditionActive || conditionActiveChanged) && conditionLongActive) {
                 val endTime = time.subtract(temporalInterval.start)
-                satisfactionState.add(TimeEvent.end(TimeInstance(endTime, true)))
+                //satisfactionState.add(TimeEvent.end(TimeInstance(endTime, true)))
+                satisfactionState.add(TimeEvent.end(TimeInstance(endTime.add(TimeInstance(1)))))
             }
         }
     }

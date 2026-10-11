@@ -95,4 +95,48 @@ class ComposedSimulationTests : SimulationTest() {
         assertStateEquals(false, 3.5)
         assertStateEquals(false, 4.0)
     }
+
+    @Test
+    fun timedUntilComposition() {
+        val formula = "(((\$A) = (\$B))U[3,3](F[2,2]((\$C) = (\$D))))"
+        load(formula)
+
+        val metricA = MetricDescriptor("", "A")
+        val metricB = MetricDescriptor("", "B")
+        val metricC = MetricDescriptor("", "C")
+        val metricD = MetricDescriptor("", "D")
+
+        // (true) U (false)
+        simulator.forceHandle(TimeInstance(0), metricA, 1.0)
+        simulator.forceHandle(TimeInstance(0), metricB, 1.0)
+        simulator.forceHandle(TimeInstance(0), metricC, 0.0)
+        simulator.forceHandle(TimeInstance(0), metricD, 1.0)
+        simulator.forceEndRound()
+
+        // (true) U (false)
+        simulator.forceHandle(TimeInstance(3), metricC, 0.0)
+        simulator.forceEndRound()
+
+        // (true) U (true)
+        simulator.forceHandle(TimeInstance(4), metricC, 1.0)
+        simulator.forceEndRound()
+
+        // (true) U (true)
+        simulator.forceHandle(TimeInstance(5), metricC, 1.0)
+        simulator.forceEndRound()
+
+        // (true) U (false)
+        simulator.forceHandle(TimeInstance(6), metricC, 0.0)
+        simulator.forceEndRound()
+
+        simulator.forceEndExperiment(TimeInstance(10))
+        assertStateEquals(true, 0.0)
+        assertStateEquals(true, 0.9)
+        assertStateEquals(false, 1.0)
+        assertStateEquals(false, 3.1)
+        assertStateEquals(false, 4.0)
+        assertStateEquals(false, 4.1)
+        assertStateEquals(false, 5.0)
+        assertStateEquals(false, 6.0)
+    }
 }
